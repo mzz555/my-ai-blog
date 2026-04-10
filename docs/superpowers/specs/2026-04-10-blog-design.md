@@ -153,7 +153,7 @@
 |------|------|------|
 | id | BIGINT PK | 主键 |
 | name | VARCHAR(50) | 菜单/按钮名称 |
-| code | VARCHAR(100) UNIQUE | 权限码（article:create）|
+| code | VARCHAR(100) UNIQUE NULL | 权限码（article:create）；纯导航菜单可为 NULL |
 | type | ENUM('MENU','BUTTON','API') | 类型 |
 | path | VARCHAR(200) | 前端路由 / 接口路径 |
 | component | VARCHAR(200) | Vue 组件路径 |
@@ -377,10 +377,10 @@ services:
 
   mysql:
     image: mysql:8.0
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: blog
-      MYSQL_CHARSET: utf8mb4
     volumes:
       - mysql_data:/var/lib/mysql
 
