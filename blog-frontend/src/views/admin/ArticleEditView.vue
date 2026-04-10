@@ -92,7 +92,11 @@ async function handleSave() {
       ElMessage.success('发布成功')
       router.push('/admin/articles')
     }
-  } finally { saving.value = false }
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || '保存失败，请重试')
+  } finally {
+    saving.value = false
+  }
 }
 
 onMounted(async () => {

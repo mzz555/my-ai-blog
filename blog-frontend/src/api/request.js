@@ -40,9 +40,7 @@ request.interceptors.response.use(
       const refreshToken = getRefreshToken()
       if (refreshToken) {
         try {
-          const res = await axios.post('/api/auth/refresh', null, {
-            params: { refreshToken },
-          })
+          const res = await axios.post('/api/auth/refresh', { refreshToken })
           const newToken = res.data.data.accessToken
           setToken(newToken)
           refreshQueue.forEach((cb) => cb())

@@ -2,11 +2,6 @@
 spring:
   profiles:
     active: dev
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    open-in-view: false
   flyway:
     locations: classpath:db/migration
     baseline-on-migrate: true
@@ -15,6 +10,11 @@ jwt:
   secret: ${JWT_SECRET:dev-secret-key-at-least-256-bits-long-for-hs256-algorithm}
   access-token-expiry: 604800   # 7 days in seconds
   refresh-token-expiry: 2592000 # 30 days in seconds
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
 
 springdoc:
   swagger-ui:

@@ -1,37 +1,62 @@
 package com.blog.entity;
 
-import jakarta.persistence.*;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-@Data @Entity @Table(name = "comments")
+/**
+ * 评论实体，对应数据库 comments 表
+ * <p>支持游客评论（userId 为 null，使用 nickname/email 字段）和登录用户评论。</p>
+ *
+ * @author blog
+ * @since 1.0.0
+ */
+@Data
+@TableName("comments")
 public class Comment {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    /** 评论 ID，自增主键 */
+    @TableId(type = IdType.AUTO)
     private Long id;
-    @Column(nullable = false, columnDefinition = "TEXT")
+
+    /** 评论内容 */
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "article_id", nullable = false)
-    private Article article;
+    /** 所属文章 ID（FK: articles.id） */
+    private Long articleId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;  // null = guest
+    /** 评论用户 ID（FK: users.id），游客评论时为 null */
+    private Long userId;
 
+    /** 父评论 ID，用于楼中楼，顶级评论为 null */
     private Long parentId;
-    @Column(length = 50)
+
+    /** 游客昵称，登录用户评论时无效 */
     private String nickname;
-    @Column(length = 100)
+
+    /** 游客邮箱，登录用户评论时无效 */
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    /** 审核状态：PENDING=待审核，APPROVED=已通过，REJECTED=已拒绝 */
     private CommentStatus status = CommentStatus.PENDING;
 
-    @Column(nullable = false, updatable = false)
+    /** 评论时间，INSERT 时自动填充 */
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
-    @PrePersist void prePersist() { createdAt = LocalDateTime.now(); }
 
-    public enum CommentStatus { PENDING, APPROVED, REJECTED }
+    /** 评论用户，非数据库字段，由 Service 层通过 userId 查询填充 */
+    @TableField(exist = false)
+    private User user;
+
+    /**
+     * 评论审核状态枚举
+     */
+    public enum CommentStatus {
+        /** 待审核 */
+        PENDING,
+        /** 已通过 */
+        APPROVED,
+        /** 已拒绝 */
+        REJECTED
+    }
 }

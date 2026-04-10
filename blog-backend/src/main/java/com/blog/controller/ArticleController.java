@@ -11,6 +11,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 文章控制器
+ * <p>提供文章的增删改查、发布状态切换等接口，
+ * 前台接口无需认证，管理端接口需要相应权限码。</p>
+ *
+ * @author blog
+ * @since 1.0.0
+ */
 @RestController
 @RequestMapping("/api/articles")
 @RequiredArgsConstructor
@@ -18,6 +26,16 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
+    /**
+     * 分页查询已发布文章（前台）
+     * <p>GET /api/articles?page=1&size=10&categoryId=1&tagSlug=java</p>
+     *
+     * @param page       页码，默认 1
+     * @param size       每页数量，默认 10
+     * @param categoryId 按分类过滤，可选
+     * @param tagSlug    按标签 slug 过滤，可选
+     * @return 分页文章列表
+     */
     @GetMapping
     public Result<PageResult<ArticleListResponse>> list(
             @RequestParam(defaultValue = "1") int page,
@@ -27,6 +45,14 @@ public class ArticleController {
         return Result.success(articleService.listPublished(page, size, categoryId, tagSlug));
     }
 
+    /**
+     * 分页查询所有文章（管理端），需要 article:list 权限
+     * <p>GET /api/articles/admin/list?page=1&size=10</p>
+     *
+     * @param page 页码，默认 1
+     * @param size 每页数量，默认 10
+     * @return 所有文章分页列表（含草稿）
+     */
     @GetMapping("/admin/list")
     @PreAuthorize("hasAuthority('article:list')")
     public Result<PageResult<ArticleListResponse>> adminList(
@@ -35,11 +61,26 @@ public class ArticleController {
         return Result.success(articleService.listAll(page, size));
     }
 
+    /**
+     * 根据 slug 查询文章详情（前台）
+     * <p>GET /api/articles/{slug}</p>
+     *
+     * @param slug 文章 URL slug
+     * @return 文章详情（含内容、作者、标签等）
+     */
     @GetMapping("/{slug}")
     public Result<ArticleDetailResponse> detail(@PathVariable String slug) {
         return Result.success(articleService.getBySlug(slug));
     }
 
+    /**
+     * 创建文章，需要 article:create 权限
+     * <p>POST /api/articles</p>
+     *
+     * @param req         文章创建请求体
+     * @param userDetails 当前登录用户（自动注入）
+     * @return 创建成功的文章实体
+     */
     @PostMapping
     @PreAuthorize("hasAuthority('article:create')")
     public Result<Article> create(@Valid @RequestBody ArticleCreateRequest req,
@@ -47,12 +88,27 @@ public class ArticleController {
         return Result.success(articleService.create(req, userDetails.getUsername()));
     }
 
+    /**
+     * 更新文章，需要 article:update 权限
+     * <p>PUT /api/articles/{id}</p>
+     *
+     * @param id  文章 ID
+     * @param req 文章更新请求体（字段可选）
+     * @return 更新后的文章实体
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('article:update')")
     public Result<Article> update(@PathVariable Long id, @RequestBody ArticleUpdateRequest req) {
         return Result.success(articleService.update(id, req));
     }
 
+    /**
+     * 切换文章发布状态，需要 article:publish 权限
+     * <p>PUT /api/articles/{id}/publish</p>
+     *
+     * @param id 文章 ID
+     * @return 操作成功响应
+     */
     @PutMapping("/{id}/publish")
     @PreAuthorize("hasAuthority('article:publish')")
     public Result<Void> publish(@PathVariable Long id) {
@@ -60,6 +116,13 @@ public class ArticleController {
         return Result.success();
     }
 
+    /**
+     * 删除文章，需要 article:delete 权限
+     * <p>DELETE /api/articles/{id}</p>
+     *
+     * @param id 文章 ID
+     * @return 操作成功响应
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('article:delete')")
     public Result<Void> delete(@PathVariable Long id) {

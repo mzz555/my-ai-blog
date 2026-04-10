@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint src --ext .vue,.js --fix",
+    "format": "prettier --write \"src/**/*.{vue,js}\""
   },
   "dependencies": {
     "vue": "^3.4.21",
@@ -17,12 +19,17 @@
     "axios": "^1.6.8",
     "md-editor-v3": "^4.14.0",
     "@vueuse/core": "^10.9.0",
+    "@vueuse/head": "^2.0.0",
     "dayjs": "^1.11.10"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
     "vite": "^5.2.0",
     "unplugin-auto-import": "^0.17.5",
-    "unplugin-vue-components": "^0.26.0"
+    "unplugin-vue-components": "^0.26.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.24.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5"
   }
 }

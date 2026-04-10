@@ -1,24 +1,28 @@
 package com.blog.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.dto.tag.TagRequest;
 import com.blog.entity.Tag;
-import com.blog.repository.TagRepository;
+import com.blog.mapper.TagMapper;
 import com.blog.service.TagService;
 import com.github.slugify.Slugify;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/**
+ * 标签服务实现
+ *
+ * @author blog
+ * @since 1.0.0
+ */
 @Service
-@RequiredArgsConstructor
-public class TagServiceImpl implements TagService {
+public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
-    private final TagRepository tagRepository;
     private final Slugify slugify = Slugify.builder().build();
 
     @Override
     public List<Tag> listAll() {
-        return tagRepository.findAll();
+        return this.list();
     }
 
     @Override
@@ -28,11 +32,12 @@ public class TagServiceImpl implements TagService {
         Tag t = new Tag();
         t.setName(req.getName());
         t.setSlug(slug);
-        return tagRepository.save(t);
+        this.save(t);
+        return t;
     }
 
     @Override
     public void delete(Long id) {
-        tagRepository.deleteById(id);
+        this.removeById(id);
     }
 }

@@ -1,38 +1,51 @@
 package com.blog.entity;
 
-import jakarta.persistence.*;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
-@Data @Entity @Table(name = "users")
+/**
+ * 用户实体，对应数据库 users 表
+ *
+ * @author blog
+ * @since 1.0.0
+ */
+@Data
+@TableName("users")
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    /** 用户 ID，自增主键 */
+    @TableId(type = IdType.AUTO)
     private Long id;
-    @Column(nullable = false, unique = true, length = 50)
+
+    /** 用户名，唯一，长度最多 50 */
     private String username;
-    @Column(nullable = false, unique = true, length = 100)
+
+    /** 邮箱，唯一，长度最多 100 */
     private String email;
-    @Column(nullable = false)
+
+    /** BCrypt 加密后的密码 */
     private String password;
+
+    /** 头像 URL */
     private String avatar;
-    @Column(columnDefinition = "TEXT")
+
+    /** 个人简介 */
     private String bio;
-    @Column(nullable = false)
+
+    /** 账号状态：1=正常，0=禁用 */
     private Integer status = 1;
-    @Column(nullable = false, updatable = false)
+
+    /** 创建时间，INSERT 时自动填充 */
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
-    @Column(nullable = false)
+
+    /** 最后更新时间，INSERT 和 UPDATE 时自动填充 */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
-
-    @PrePersist
-    void prePersist() { createdAt = updatedAt = LocalDateTime.now(); }
-    @PreUpdate
-    void preUpdate() { updatedAt = LocalDateTime.now(); }
+    /** 用户角色列表，非数据库字段，由 Service 层通过 user_roles 表手动填充 */
+    @TableField(exist = false)
+    private List<Role> roles;
 }

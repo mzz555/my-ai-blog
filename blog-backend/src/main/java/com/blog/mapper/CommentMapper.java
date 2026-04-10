@@ -1,0 +1,30 @@
+package com.blog.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.blog.entity.Comment;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import java.util.List;
+
+/**
+ * 评论数据访问层
+ *
+ * @author blog
+ * @since 1.0.0
+ */
+@Mapper
+public interface CommentMapper extends BaseMapper<Comment> {
+
+    /**
+     * 查询文章的已审核评论，按创建时间升序（用于构建评论树）
+     *
+     * @param articleId 文章 ID
+     * @param status    状态字符串（如 "APPROVED"）
+     * @return 评论列表
+     */
+    @Select("SELECT * FROM comments WHERE article_id = #{articleId} AND status = #{status} " +
+            "ORDER BY created_at ASC")
+    List<Comment> selectApprovedByArticleId(@Param("articleId") Long articleId,
+                                            @Param("status") String status);
+}

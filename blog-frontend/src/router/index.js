@@ -64,4 +64,11 @@ router.beforeEach(async (to) => {
   if (to.name === 'Login' && token) return '/admin'
 })
 
+// 兜底 404 路由，必须在所有路由之后注册
+router.addRoute({
+  path: '/:pathMatch(.*)*',
+  name: 'NotFound',
+  component: () => import('@/views/NotFoundView.vue'),
+})
+
 export default router

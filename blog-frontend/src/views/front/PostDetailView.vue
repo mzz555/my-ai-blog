@@ -26,6 +26,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useHead } from '@vueuse/head'
 import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import { getArticleBySlug, recordView } from '@/api/article'
@@ -38,6 +39,19 @@ const article = ref(null)
 onMounted(async () => {
   const res = await getArticleBySlug(route.params.slug)
   article.value = res.data
+
+  // 动态设置页面 title 和 SEO meta
+  useHead({
+    title: `${article.value.title} - 技术博客`,
+    meta: [
+      { name: 'description', content: article.value.summary || article.value.title },
+      { property: 'og:title', content: article.value.title },
+      { property: 'og:description', content: article.value.summary || article.value.title },
+      { property: 'og:image', content: article.value.coverImage || '' },
+      { property: 'og:type', content: 'article' },
+    ],
+  })
+
   recordView(article.value.id)
 })
 </script>

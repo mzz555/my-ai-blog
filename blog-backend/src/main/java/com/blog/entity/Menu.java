@@ -1,30 +1,59 @@
 package com.blog.entity;
 
-import jakarta.persistence.*;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
-@Data @Entity @Table(name = "menus")
+/**
+ * 菜单/权限实体，对应数据库 menus 表
+ * <p>用于 RBAC 权限体系，支持三种类型：导航菜单（MENU）、按钮权限（BUTTON）、API 权限（API）。</p>
+ *
+ * @author blog
+ * @since 1.0.0
+ */
+@Data
+@TableName("menus")
 public class Menu {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    /** 菜单 ID，自增主键 */
+    @TableId(type = IdType.AUTO)
     private Long id;
-    @Column(nullable = false, length = 50)
+
+    /** 菜单名称 */
     private String name;
-    @Column(unique = true, length = 100)
-    private String code;  // nullable for pure nav menus
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+
+    /** 权限唯一编码，如 article:create，纯导航菜单可为 null */
+    private String code;
+
+    /** 菜单类型：MENU=导航菜单，BUTTON=按钮权限，API=接口权限 */
     private MenuType type;
-    @Column(length = 200)
+
+    /** 前端路由路径 */
     private String path;
-    @Column(length = 200)
+
+    /** 前端组件路径 */
     private String component;
-    @Column(length = 50)
+
+    /** 菜单图标 */
     private String icon;
+
+    /** 父级菜单 ID，顶级菜单为 null */
     private Long parentId;
-    @Column(nullable = false)
+
+    /** 排序序号 */
     private Integer sortOrder = 0;
-    @Column(nullable = false)
+
+    /** 状态：1=启用，0=禁用 */
     private Integer status = 1;
 
-    public enum MenuType { MENU, BUTTON, API }
+    /**
+     * 菜单类型枚举
+     */
+    public enum MenuType {
+        /** 导航菜单 */
+        MENU,
+        /** 按钮权限 */
+        BUTTON,
+        /** API 接口权限 */
+        API
+    }
 }

@@ -1,6 +1,6 @@
 package com.blog.service.impl;
 
-import com.blog.repository.*;
+import com.blog.mapper.*;
 import com.blog.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,14 +9,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
+/**
+ * 统计服务实现
+ * <p>管理文章浏览量：先写入 Redis，再定期（每 5 分钟）批量同步到数据库，
+ * 避免高频写库导致的性能问题。</p>
+ *
+ * @author blog
+ * @since 1.0.0
+ */
 @Service
 @RequiredArgsConstructor
 public class StatsServiceImpl implements StatsService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ArticleRepository articleRepository;
-    private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
+    private final ArticleMapper articleMapper;
+    private final CommentMapper commentMapper;
+    private final UserMapper userMapper;
 
     private static final String VIEW_KEY_PREFIX = "article:view:";
 
@@ -36,7 +44,7 @@ public class StatsServiceImpl implements StatsService {
             if (val != null) {
                 Long articleId = Long.parseLong(key.replace(VIEW_KEY_PREFIX, ""));
                 int count = Integer.parseInt(val.toString());
-                articleRepository.incrementViewCount(articleId, count);
+                articleMapper.incrementViewCount(articleId, count);
                 redisTemplate.delete(key);
             }
         });
@@ -45,9 +53,9 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public Map<String, Object> getOverview() {
         Map<String, Object> stats = new HashMap<>();
-        stats.put("totalArticles", articleRepository.count());
-        stats.put("totalComments", commentRepository.count());
-        stats.put("totalUsers", userRepository.count());
+        stats.put("totalArticles", articleMapper.selectCount(null));
+        stats.put("totalComments", commentMapper.selectCount(null));
+        stats.put("totalUsers", userMapper.selectCount(null));
         return stats;
     }
 }

@@ -1,18 +1,31 @@
 package com.blog.entity;
 
-import jakarta.persistence.*;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
-@Data @Entity @Table(name = "categories")
+/**
+ * 文章分类实体，对应数据库 categories 表
+ *
+ * @author blog
+ * @since 1.0.0
+ */
+@Data
+@TableName("categories")
 public class Category {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    /** 分类 ID，自增主键 */
+    @TableId(type = IdType.AUTO)
     private Long id;
-    @Column(nullable = false, length = 50)
+
+    /** 分类名称 */
     private String name;
-    @Column(nullable = false, unique = true, length = 50)
+
+    /** 分类 URL slug，唯一，用于 SEO 友好的 URL */
     private String slug;
-    @Column(length = 200)
+
+    /** 分类描述 */
     private String description;
-    @Column(nullable = false)
+
+    /** 排序序号，数字越小越靠前 */
     private Integer sortOrder = 0;
 }
