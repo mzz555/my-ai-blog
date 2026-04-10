@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleValidation(MethodArgumentNotValidException ex) {
         FieldError field = ex.getBindingResult().getFieldErrors().get(0);
-        return Result.error(400, field.getDefaultMessage());
+        return Result.error(400, field.getField() + ": " + field.getDefaultMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -1,18 +1,15 @@
 package com.blog.common;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Data
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Result<T> {
-    private int code;
-    private String message;
-    private T data;
-
-    private Result(int code, String message, T data) {
-        this.code = code;
-        this.message = message;
-        this.data = data;
-    }
+    private final int code;
+    private final String message;
+    private final T data;
 
     public static <T> Result<T> success(T data) {
         return new Result<>(200, null, data);
