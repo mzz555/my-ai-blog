@@ -41,6 +41,9 @@ public class Article {
     /** 浏览量，由 Redis 定期同步 */
     private Integer viewCount = 0;
 
+    /** 点赞数 */
+    private Integer likeCount = 0;
+
     /** 是否置顶 */
     private Boolean isTop = false;
 

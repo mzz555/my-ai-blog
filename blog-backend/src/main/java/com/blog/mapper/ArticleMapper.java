@@ -47,4 +47,27 @@ public interface ArticleMapper extends BaseMapper<Article> {
      */
     @Update("UPDATE articles SET view_count = view_count + #{count} WHERE id = #{id}")
     void incrementViewCount(@Param("id") Long id, @Param("count") int count);
+
+    /**
+     * 按状态统计文章数量（用于仪表盘概览）
+     *
+     * @param status 状态字符串（如 "PUBLISHED" 或 "DRAFT"）
+     * @return 该状态的文章总数
+     */
+    @Select("SELECT COUNT(*) FROM articles WHERE status = #{status}")
+    long countByStatus(@Param("status") String status);
+
+    @Select("SELECT * FROM articles WHERE status = 'PUBLISHED' " +
+            "AND (title LIKE CONCAT('%',#{keyword},'%') OR summary LIKE CONCAT('%',#{keyword},'%')) " +
+            "ORDER BY is_top DESC, published_at DESC LIMIT #{offset}, #{size}")
+    List<Article> searchPublished(@Param("keyword") String keyword,
+                                  @Param("offset") int offset,
+                                  @Param("size") int size);
+
+    @Select("SELECT COUNT(*) FROM articles WHERE status = 'PUBLISHED' " +
+            "AND (title LIKE CONCAT('%',#{keyword},'%') OR summary LIKE CONCAT('%',#{keyword},'%'))")
+    long countSearchPublished(@Param("keyword") String keyword);
+
+    @Update("UPDATE articles SET like_count = like_count + 1 WHERE id = #{id}")
+    void incrementLikeCount(@Param("id") Long id);
 }

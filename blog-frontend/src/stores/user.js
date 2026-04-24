@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { getMe, login as loginApi } from '@/api/auth'
 import { getToken, setToken, setRefreshToken, clearAuth } from '@/utils/auth'
+import { resetAdminRoutes } from '@/router'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(getToken() || '')
@@ -32,6 +33,7 @@ export const useUserStore = defineStore('user', () => {
     token.value = ''
     userInfo.value = null
     clearAuth()
+    resetAdminRoutes()
   }
 
   return { token, userInfo, isLoggedIn, permissions, menus, login, fetchUserInfo, hasPermission, logout }

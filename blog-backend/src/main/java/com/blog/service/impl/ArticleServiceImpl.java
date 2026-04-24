@@ -13,8 +13,10 @@ import com.blog.mapper.*;
 import com.blog.service.ArticleService;
 import com.github.slugify.Slugify;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final CategoryMapper categoryMapper;
     private final TagMapper tagMapper;
     private final ArticleTagMapper articleTagMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final Slugify slugify = Slugify.builder().build();
 
     @Override
@@ -292,5 +295,31 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     private String resolveSlug(String slug, String title) {
         return (slug != null && !slug.isBlank()) ? slug : slugify.slugify(title);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResult<ArticleListResponse> search(String keyword, int page, int size) {
+        int offset = (page - 1) * size;
+        List<Article> articles = this.baseMapper.searchPublished(keyword, offset, size);
+        long total = this.baseMapper.countSearchPublished(keyword);
+        fillAssociations(articles);
+        List<ArticleListResponse> list = articles.stream().map(this::toListResponse).toList();
+        return PageResult.of(list, total, page, size);
+    }
+
+    @Override
+    @Transactional
+    public int like(Long id, String clientIp) {
+        String likeKey = "article:liked:" + id + ":" + clientIp;
+        Boolean alreadyLiked = redisTemplate.hasKey(likeKey);
+        if (Boolean.TRUE.equals(alreadyLiked)) {
+            Article a = this.getById(id);
+            return a != null ? (a.getLikeCount() != null ? a.getLikeCount() : 0) : 0;
+        }
+        this.baseMapper.incrementLikeCount(id);
+        redisTemplate.opsForValue().set(likeKey, "1", Duration.ofHours(24));
+        Article updated = this.getById(id);
+        return updated != null ? (updated.getLikeCount() != null ? updated.getLikeCount() : 0) : 0;
     }
 }

@@ -1,0 +1,185 @@
+/* ── Design tokens extracted from test.pen ── */
+
+/* Light theme (default) */
+:root {
+  --color-bg:            #F7F7F2;
+  --color-bg-secondary:  #F0F0E8;
+  --color-bg-tertiary:   #E8E8E0;
+  --color-surface:       #FFFFFF;
+  --color-surface-2:     #FFFBEB;
+  --color-surface-hover: #FAFAF5;
+  --color-border:        #E5E7EB;
+  --color-border-light:  #F0F2F5;
+
+  --color-text-primary:   #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary:  #9CA3AF;
+  --color-text-disabled:  #C4C7CE;
+  --color-text-muted:     #9CA3AF;
+
+  --color-accent:        #E8A838;
+  --color-accent-hover:  #D4942A;
+  --color-accent-light:  #FEF3C7;
+  --color-accent-border: #FDE68A;
+  --color-accent-text:   #92400E;
+
+  --color-danger:  #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+
+  --color-header-bg:     rgba(255, 255, 255, 0.95);
+  --color-header-border: #E5E7EB;
+  --color-sidebar-bg:    #111119;
+  --color-sidebar-text:  #8A8AAE;
+  --color-sidebar-active:#E8A838;
+
+  --shadow-sm:        0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:        0 4px 16px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:        0 8px 32px rgba(0,0,0,.10), 0 4px 8px rgba(0,0,0,.06);
+  --shadow-card:      0 2px 16px rgba(0,0,0,.08);
+  --shadow-card-hover:0 8px 32px rgba(0,0,0,.14);
+
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   12px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
+
+  --font-sans: 'Inter', 'PingFang SC', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  --header-height:          72px;
+  --sidebar-width:          240px;
+  --sidebar-collapsed-width:64px;
+  --content-max-width:      1440px;
+  --prose-max-width:        780px;
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+  --color-bg:            #0C0C10;
+  --color-bg-secondary:  #0A0A12;
+  --color-bg-tertiary:   #0D0D18;
+  --color-surface:       #13131E;
+  --color-surface-2:     #16162A;
+  --color-surface-hover: #1C1C30;
+  --color-border:        #1C1C2C;
+  --color-border-light:  #1E1E2C;
+
+  --color-text-primary:   #F0F0F8;
+  --color-text-secondary: #8A8A9E;
+  --color-text-tertiary:  #6E6E82;
+  --color-text-disabled:  #3A3A5C;
+  --color-text-muted:     #3A3A5C;
+
+  --color-accent:        #E8A838;
+  --color-accent-hover:  #F5BC50;
+  --color-accent-light:  #1A1808;
+  --color-accent-border: #3A3010;
+  --color-accent-text:   #E8A838;
+
+  --color-header-bg:     rgba(12, 12, 16, 0.95);
+  --color-header-border: #1C1C2C;
+  --color-sidebar-bg:    #111119;
+  --color-sidebar-text:  #8A8AAE;
+  --color-sidebar-active:#E8A838;
+
+  --shadow-sm:        0 1px 3px rgba(0,0,0,.4),  0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:        0 4px 16px rgba(0,0,0,.5),  0 2px 4px rgba(0,0,0,.4);
+  --shadow-lg:        0 10px 32px rgba(0,0,0,.6),  0 4px 8px rgba(0,0,0,.5);
+  --shadow-card:      0 2px 8px rgba(0,0,0,.5);
+  --shadow-card-hover:0 8px 32px rgba(0,0,0,.6);
+}
+
+/* ── Global resets ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+body { margin: 0; padding: 0; background-color: var(--color-bg); }
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
+
+/* ── Element Plus overrides ── */
+.el-card {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  box-shadow: var(--shadow-card) !important;
+  border-radius: var(--radius-lg) !important;
+  transition: box-shadow var(--transition-base) !important;
+}
+.el-card:hover { box-shadow: var(--shadow-card-hover) !important; }
+.el-card__header { border-bottom-color: var(--color-border) !important; color: var(--color-text-primary) !important; }
+.el-card__body { color: var(--color-text-secondary) !important; }
+
+[data-theme='dark'] .el-input__wrapper,
+[data-theme='dark'] .el-textarea__inner {
+  background-color: var(--color-surface) !important;
+  box-shadow: 0 0 0 1px var(--color-border) inset !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme='dark'] .el-select .el-input__wrapper { background-color: var(--color-surface) !important; }
+[data-theme='dark'] .el-table {
+  background-color: var(--color-surface) !important;
+  --el-table-header-bg-color: var(--color-bg-secondary);
+  --el-table-row-hover-bg-color: var(--color-surface-hover);
+  --el-table-border-color: var(--color-border);
+  --el-table-text-color: var(--color-text-primary);
+  --el-table-header-text-color: var(--color-text-secondary);
+}
+[data-theme='dark'] .el-dialog { background-color: var(--color-surface) !important; }
+[data-theme='dark'] .el-dropdown-menu { background-color: var(--color-surface) !important; border-color: var(--color-border) !important; }
+[data-theme='dark'] .el-pagination {
+  --el-pagination-bg-color: var(--color-surface);
+  --el-pagination-button-color: var(--color-text-secondary);
+}
+[data-theme='dark'] .el-tag {
+  background-color: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-secondary) !important;
+}
+.el-button--primary {
+  --el-button-bg-color: #E8A838 !important;
+  --el-button-border-color: #E8A838 !important;
+  --el-button-hover-bg-color: #D4942A !important;
+  --el-button-hover-border-color: #D4942A !important;
+  --el-button-text-color: #111827 !important;
+}
+[data-theme='dark'] .el-button--primary {
+  --el-button-hover-bg-color: #F5BC50 !important;
+  --el-button-hover-border-color: #F5BC50 !important;
+  --el-button-text-color: #0C0C10 !important;
+}

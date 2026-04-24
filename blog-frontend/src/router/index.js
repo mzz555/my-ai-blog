@@ -14,6 +14,7 @@ const staticRoutes = [
       { path: 'tag/:slug', name: 'Tag', component: () => import('@/views/front/TagView.vue') },
       { path: 'archive', name: 'Archive', component: () => import('@/views/front/ArchiveView.vue') },
       { path: 'about', name: 'About', component: () => import('@/views/front/AboutView.vue') },
+      { path: 'search', name: 'Search', component: () => import('@/views/front/SearchView.vue') },
     ]
   },
   { path: '/login', name: 'Login', component: () => import('@/views/LoginView.vue') },
@@ -22,6 +23,7 @@ const staticRoutes = [
 export const adminRoutes = [
   {
     path: '/admin',
+    name: 'AdminRoot',
     component: () => import('@/layouts/AdminLayout.vue'),
     meta: { requiresAuth: true },
     children: [
@@ -33,6 +35,9 @@ export const adminRoutes = [
       { path: 'categories', name: 'CategoryManage', component: () => import('@/views/admin/CategoryManageView.vue') },
       { path: 'tags', name: 'TagManage', component: () => import('@/views/admin/TagManageView.vue') },
       { path: 'profile', name: 'Profile', component: () => import('@/views/admin/ProfileView.vue') },
+      { path: 'users', name: 'UserManage', component: () => import('@/views/admin/UserManageView.vue') },
+      { path: 'roles', name: 'RoleManage', component: () => import('@/views/admin/RoleManageView.vue') },
+      { path: 'menus', name: 'MenuManage', component: () => import('@/views/admin/MenuManageView.vue'), meta: { title: '菜单管理' } },
     ]
   }
 ]
@@ -43,20 +48,27 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 })
 
-let adminRoutesAdded = false
+// 检查 admin 路由是否已注册（替代模块级 flag，避免注销后角色污染）
+const adminRouteRegistered = () => router.hasRoute('AdminRoot')
+
+// 供 user store logout 调用：清除动态注册的 admin 路由
+export function resetAdminRoutes() {
+  if (adminRouteRegistered()) {
+    router.removeRoute('AdminRoot')
+  }
+}
 
 router.beforeEach(async (to) => {
   const token = getToken()
 
   if (to.path.startsWith('/admin')) {
     if (!token) return '/login'
-    if (!adminRoutesAdded) {
+    if (!adminRouteRegistered()) {
       const userStore = useUserStore()
       if (!userStore.userInfo) {
         try { await userStore.fetchUserInfo() } catch { return '/login' }
       }
       adminRoutes.forEach(r => router.addRoute(r))
-      adminRoutesAdded = true
       return to.fullPath
     }
   }

@@ -4,6 +4,7 @@ import com.blog.common.*;
 import com.blog.dto.article.*;
 import com.blog.entity.Article;
 import com.blog.service.ArticleService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -128,5 +129,20 @@ public class ArticleController {
     public Result<Void> delete(@PathVariable Long id) {
         articleService.delete(id);
         return Result.success();
+    }
+
+    @GetMapping("/search")
+    public Result<PageResult<ArticleListResponse>> search(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Result.success(articleService.search(q.trim(), page, size));
+    }
+
+    @PostMapping("/{id}/like")
+    public Result<Integer> like(@PathVariable Long id, HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank()) ip = request.getRemoteAddr();
+        return Result.success(articleService.like(id, ip));
     }
 }

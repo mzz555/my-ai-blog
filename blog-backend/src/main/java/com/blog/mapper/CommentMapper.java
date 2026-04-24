@@ -27,4 +27,13 @@ public interface CommentMapper extends BaseMapper<Comment> {
             "ORDER BY created_at ASC")
     List<Comment> selectApprovedByArticleId(@Param("articleId") Long articleId,
                                             @Param("status") String status);
+
+    /**
+     * 按状态统计评论数量（用于仪表盘概览）
+     *
+     * @param status 状态字符串（如 "PENDING"）
+     * @return 该状态的评论总数
+     */
+    @Select("SELECT COUNT(*) FROM comments WHERE status = #{status}")
+    long countByStatus(@Param("status") String status);
 }
