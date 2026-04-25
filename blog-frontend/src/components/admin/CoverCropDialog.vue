@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onUnmounted } from 'vue'
 import Cropper from 'cropperjs'
 import 'cropperjs/dist/cropper.css'
 import { uploadImage } from '@/api/upload'
@@ -36,20 +36,18 @@ const imgRef = ref(null)
 const previewUrl = ref('')
 const uploading = ref(false)
 let cropper = null
-let cropperTimer = null
 
 watch(
   () => props.visible,
-  (val) => {
+  async (val) => {
     if (val && props.file) {
       previewUrl.value = URL.createObjectURL(props.file)
-      cropperTimer = setTimeout(() => {
-        if (!imgRef.value) return
-        cropper = new Cropper(imgRef.value, {
-          aspectRatio: 16 / 9,
-          viewMode: 1,
-        })
-      }, 50)
+      await nextTick()
+      if (!imgRef.value) return
+      cropper = new Cropper(imgRef.value, {
+        aspectRatio: 16 / 9,
+        viewMode: 1,
+      })
     } else {
       destroyCropper()
     }
@@ -57,7 +55,6 @@ watch(
 )
 
 function destroyCropper() {
-  if (cropperTimer) { clearTimeout(cropperTimer); cropperTimer = null }
   if (cropper) { cropper.destroy(); cropper = null }
   if (previewUrl.value) { URL.revokeObjectURL(previewUrl.value); previewUrl.value = '' }
 }
