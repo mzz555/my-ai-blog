@@ -47,6 +47,13 @@ import ArticleCard from '@/components/front/ArticleCard.vue'
 
 const route = useRoute()
 
+const articles = ref([])
+const category = ref(null)
+const loading = ref(false)
+const page = ref(1)
+const pageSize = 10
+const total = ref(0)
+
 const blogName = import.meta.env.VITE_BLOG_NAME || 'DevLog.'
 
 useHead({
@@ -63,13 +70,6 @@ useHead({
     { property: 'og:type', content: 'website' },
   ],
 })
-
-const articles = ref([])
-const category = ref(null)
-const loading = ref(false)
-const page = ref(1)
-const pageSize = 10
-const total = ref(0)
 
 async function load(p = 1) {
   loading.value = true
