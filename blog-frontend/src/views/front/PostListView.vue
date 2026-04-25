@@ -52,9 +52,21 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useHead } from '@vueuse/head'
 import { getArticles } from '@/api/article'
 import { getCategories } from '@/api/category'
 import ArticleCard from '@/components/front/ArticleCard.vue'
+
+const blogName = import.meta.env.VITE_BLOG_NAME || 'DevLog.'
+
+useHead({
+  title: `文章列表 | ${blogName}`,
+  meta: [
+    { name: 'description', content: '探索 Spring Boot、Vue 3、云原生与工程实践技术文章。' },
+    { property: 'og:title', content: `文章列表 | ${blogName}` },
+    { property: 'og:type', content: 'website' },
+  ],
+})
 
 const articles = ref([])
 const categories = ref([])
