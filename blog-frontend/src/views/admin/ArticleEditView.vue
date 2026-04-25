@@ -30,6 +30,21 @@
           </el-form-item>
         </el-col>
       </el-row>
+      <el-form-item label="封面图">
+        <div style="display:flex;align-items:center;gap:12px">
+          <img v-if="form.coverImage" :src="form.coverImage"
+            style="width:120px;height:70px;object-fit:cover;border-radius:4px;border:1px solid #2A2A3C" />
+          <el-upload :before-upload="handleCoverUpload" :show-file-list="false" accept="image/*">
+            <el-button :loading="coverUploading" size="small">
+              {{ form.coverImage ? '更换封面' : '上传封面' }}
+            </el-button>
+          </el-upload>
+          <el-button v-if="form.coverImage" size="small" @click="form.coverImage = ''">移除</el-button>
+        </div>
+      </el-form-item>
+      <el-form-item label="Slug">
+        <el-input v-model="form.slug" placeholder="URL 路径（自动生成，可手动修改）" />
+      </el-form-item>
       <el-form-item label="摘要">
         <el-input v-model="form.summary" type="textarea" :rows="2" placeholder="文章摘要（SEO）" />
       </el-form-item>
@@ -49,11 +64,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
-import { createArticle, updateArticle } from '@/api/article'
+import { createArticle, updateArticle, getArticleById } from '@/api/article'
 import { getCategories } from '@/api/category'
 import { getTags } from '@/api/tag'
 import { uploadImage } from '@/api/upload'
@@ -65,10 +80,20 @@ const isEdit = computed(() => !!route.params.id)
 const saving = ref(false)
 const categories = ref([])
 const tags = ref([])
+const coverUploading = ref(false)
 
 const form = reactive({
   title: '', slug: '', summary: '', content: '', coverImage: '',
   status: 'DRAFT', categoryId: null, tagNames: [], isTop: false, allowComment: true,
+})
+
+watch(() => form.title, (val) => {
+  if (!isEdit.value && !form.slug) {
+    form.slug = val.toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]/g, '')
+      .slice(0, 100)
+  }
 })
 
 async function handleUpload(files, callback) {
@@ -77,6 +102,19 @@ async function handleUpload(files, callback) {
     return res.data
   }))
   callback(results)
+}
+
+async function handleCoverUpload(file) {
+  coverUploading.value = true
+  try {
+    const res = await uploadImage(file.raw || file)
+    form.coverImage = res.data
+  } catch {
+    ElMessage.error('封面上传失败')
+  } finally {
+    coverUploading.value = false
+  }
+  return false
 }
 
 async function handleSave() {
@@ -103,5 +141,26 @@ onMounted(async () => {
   const [catRes, tagRes] = await Promise.all([getCategories(), getTags()])
   categories.value = catRes.data
   tags.value = tagRes.data
+
+  if (isEdit.value) {
+    try {
+      const res = await getArticleById(route.params.id)
+      const a = res.data
+      Object.assign(form, {
+        title: a.title,
+        slug: a.slug,
+        summary: a.summary || '',
+        content: a.content || '',
+        coverImage: a.coverImage || '',
+        status: a.status || 'DRAFT',
+        categoryId: a.categoryId || null,
+        tagNames: a.tagNames || [],
+        isTop: a.isTop || false,
+        allowComment: a.allowComment !== false,
+      })
+    } catch {
+      ElMessage.error('加载文章失败')
+    }
+  }
 })
 </script>

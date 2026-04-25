@@ -121,6 +121,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     @Transactional(readOnly = true)
+    public ArticleDetailResponse getByIdForAdmin(Long id) {
+        Article article = this.getById(id);
+        if (article == null) throw new NotFoundException("文章不存在");
+        fillAssociations(List.of(article));
+        return toDetailResponse(article);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ArticleDetailResponse getBySlug(String slug) {
         Article article = this.baseMapper.selectBySlugAndStatus(slug, ArticleStatus.PUBLISHED.name());
         if (article == null) throw new NotFoundException("文章不存在");
@@ -253,6 +262,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (a.getTags() != null) {
             r.setTagNames(a.getTags().stream().map(Tag::getName).toList());
         }
+        r.setStatus(a.getStatus() != null ? a.getStatus().name() : "DRAFT");
         return r;
     }
 

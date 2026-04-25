@@ -76,5 +76,7 @@ public interface ArticleService extends IService<Article> {
 
     PageResult<ArticleListResponse> search(String keyword, int page, int size);
 
+    ArticleDetailResponse getByIdForAdmin(Long id);
+
     int like(Long id, String clientIp);
 }

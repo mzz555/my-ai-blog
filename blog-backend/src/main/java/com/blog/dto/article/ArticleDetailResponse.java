@@ -22,4 +22,6 @@ public class ArticleDetailResponse {
     private List<String> tagNames;
     private String authorName;
     private String authorAvatar;
+    /** 文章状态：DRAFT 或 PUBLISHED */
+    private String status;
 }

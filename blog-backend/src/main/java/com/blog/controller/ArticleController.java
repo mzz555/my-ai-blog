@@ -75,6 +75,16 @@ public class ArticleController {
     }
 
     /**
+     * 根据 ID 查询文章（管理端编辑用）
+     * GET /api/articles/admin/{id}
+     */
+    @GetMapping("/admin/{id}")
+    @PreAuthorize("hasAuthority('article:update')")
+    public Result<ArticleDetailResponse> adminDetail(@PathVariable Long id) {
+        return Result.success(articleService.getByIdForAdmin(id));
+    }
+
+    /**
      * 创建文章，需要 article:create 权限
      * <p>POST /api/articles</p>
      *
