@@ -189,12 +189,12 @@ function handleLogout() {
 .user-trigger:hover { background: var(--color-bg-secondary); }
 
 .user-avatar {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #E8A838;
-  color: #0C0C10;
-  font-size: 12px;
+  color: #000;
+  font-size: 14px;
   font-weight: 700;
   display: flex;
   align-items: center;

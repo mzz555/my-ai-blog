@@ -48,21 +48,22 @@ function isActive(path) {
 <style scoped>
 .sidebar-wrap {
   height: 100%;
-  background: #0D0D18;
+  background: #111119;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-right: 1px solid rgba(255,255,255,.06);
+  border-right: 1px solid #1E1E2C;
 }
 
 .sidebar-logo {
-  height: var(--header-height);
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid rgba(255,255,255,.06);
+  border-bottom: 1px solid #1E1E2C;
   flex-shrink: 0;
-  padding: 0 16px;
+  padding: 0 20px;
+  gap: 10px;
 }
 
 .logo-text {
@@ -84,8 +85,8 @@ function isActive(path) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 12px 8px;
+  gap: 4px;
+  padding: 16px 12px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -93,25 +94,26 @@ function isActive(path) {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
+  gap: 10px;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 6px;
   color: #6E6E82;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition: background 0.15s, color 0.15s;
 }
-.nav-item:hover {
-  background: rgba(255,255,255,.06);
-  color: #C0C0D0;
+.nav-item:hover:not(.active) {
+  background: #16162A;
+  color: #9CA3AF;
 }
+.nav-item.router-link-active,
 .nav-item.active {
-  background: rgba(232,168,56,.12);
+  background: #1E1E30;
   color: #E8A838;
-  border-color: rgba(232,168,56,.2);
+  font-weight: 600;
 }
 
 .nav-label { flex: 1; }
