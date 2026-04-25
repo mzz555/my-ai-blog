@@ -345,4 +345,28 @@ onMounted(() => {
 .act-btn--del     { background: #2D1A1A; border-color: #5B2626; color: #EF4444; }
 
 .pagination-wrap { display: flex; justify-content: flex-end; }
+
+/* Pencil 表格深色覆盖 */
+:deep(.el-table) {
+  background: transparent !important;
+  color: #F0F0F8;
+}
+:deep(.el-table__header-wrapper th) {
+  background: #111119 !important;
+  color: #6E6E82;
+  font-weight: 500;
+  height: 44px;
+}
+:deep(.el-table__row) {
+  background: transparent !important;
+  height: 60px;
+}
+:deep(.el-table__row:nth-child(even)) {
+  background: #0D0D1A !important;
+}
+:deep(.el-table__row:hover td) {
+  background: #16162A !important;
+}
+:deep(.el-table td) { border-bottom: 1px solid #1C1C2C !important; }
+:deep(.el-table th) { border-bottom: 1px solid #1E1E2C !important; }
 </style>
