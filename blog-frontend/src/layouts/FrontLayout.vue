@@ -112,9 +112,9 @@ function doSearch() {
   position: sticky;
   top: 0;
   z-index: 100;
-  height: var(--header-height);
-  background: var(--color-header-bg);
-  border-bottom: 1px solid var(--color-header-border);
+  height: 72px;
+  background: #0C0C10;
+  border-bottom: 1px solid #1C1C2C;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -127,7 +127,7 @@ function doSearch() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-6);
+  gap: 32px;
 }
 
 .brand {
@@ -144,27 +144,27 @@ function doSearch() {
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
+  gap: 32px;
   flex: 1;
   justify-content: center;
 }
 
 .nav-link {
-  color: var(--color-text-secondary);
+  color: #9CA3AF;
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: normal;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   transition: color var(--transition-fast), background var(--transition-fast);
 }
 .nav-link:hover {
-  color: var(--color-accent);
+  color: #E8A838;
   background: var(--color-accent-light);
 }
 .nav-link.router-link-exact-active,
 .nav-link.router-link-active {
-  color: var(--color-text-primary);
+  color: #E8A838;
   font-weight: 600;
 }
 
@@ -186,11 +186,11 @@ function doSearch() {
 .nav-cta {
   display: inline-flex;
   align-items: center;
-  padding: 9px 22px;
+  padding: 7px 18px;
   background: #E8A838;
   color: #0C0C10;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
   text-decoration: none;
   transition: background var(--transition-fast);

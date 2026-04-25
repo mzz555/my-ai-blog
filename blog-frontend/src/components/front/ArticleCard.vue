@@ -34,27 +34,25 @@ defineProps({ article: Object })
 
 <style scoped>
 .article-card {
-  display: flex;
-  gap: 24px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
+  background: #13131E;
+  border: 1px solid #1C1C2C;
+  border-radius: 8px;
+  overflow: hidden;
   cursor: pointer;
-  transition: box-shadow var(--transition-base), transform var(--transition-base), border-color var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, transform var(--transition-base);
 }
 .article-card:hover {
-  box-shadow: var(--shadow-card-hover);
-  border-color: rgba(232,168,56,.35);
+  border-color: rgba(232, 168, 56, 0.4);
   transform: translateY(-2px);
 }
 
 .cover {
-  flex-shrink: 0;
-  width: 200px;
-  height: 130px;
-  border-radius: var(--radius-md);
+  width: 100%;
+  height: 140px;
   overflow: hidden;
+  background: #1C1C2E;
 }
 .cover img {
   width: 100%;
@@ -65,30 +63,28 @@ defineProps({ article: Object })
 .article-card:hover .cover img { transform: scale(1.04); }
 
 .body {
-  flex: 1;
-  min-width: 0;
+  padding: 20px 20px 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-.meta-top { display: flex; gap: 8px; }
+.meta-top { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
 }
-.badge-top { background: rgba(239,68,68,.12); color: #ef4444; border: 1px solid rgba(239,68,68,.25); }
-.badge-cat { background: rgba(232,168,56,.12); color: #E8A838; border: 1px solid rgba(232,168,56,.25); }
+.badge-top { background: #1C1C2E; color: #E8A838; }
+.badge-cat { background: #1C1C2E; color: #8A8A9E; }
 
 .title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  color: #F0F0F8;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -101,37 +97,31 @@ defineProps({ article: Object })
 .summary {
   margin: 0;
   font-size: 13px;
-  color: var(--color-text-secondary);
-  line-height: 1.7;
+  color: #8A8A9E;
+  line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  flex: 1;
 }
 
-.meta-bottom {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
+.meta-bottom { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 .meta-item {
   display: flex;
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: var(--color-text-tertiary);
+  color: #6E6E82;
 }
 
-.meta-icon { width: 13px; height: 13px; }
+.meta-icon { width: 12px; height: 12px; }
 
 .tag-link {
-  font-size: 12px;
-  color: #E8A838;
+  font-size: 11px;
+  color: #6E6E82;
   cursor: pointer;
   transition: color var(--transition-fast);
 }
-.tag-link:hover { color: #F5BC50; }
+.tag-link:hover { color: #E8A838; }
 </style>
