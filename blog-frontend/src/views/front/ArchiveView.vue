@@ -43,9 +43,21 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useHead } from '@vueuse/head'
 import { getArticles } from '@/api/article'
 import { formatDate } from '@/utils/format'
 import dayjs from 'dayjs'
+
+const blogName = import.meta.env.VITE_BLOG_NAME || 'DevLog.'
+
+useHead({
+  title: `归档 | ${blogName}`,
+  meta: [
+    { name: 'description', content: '按时间浏览所有文章归档。' },
+    { property: 'og:title', content: `归档 | ${blogName}` },
+    { property: 'og:type', content: 'website' },
+  ],
+})
 
 const articles = ref([])
 const loading = ref(false)
