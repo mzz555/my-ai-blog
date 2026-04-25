@@ -43,7 +43,7 @@
           </div>
 
           <div class="markdown-body">
-            <MdEditor v-model="article.content" previewOnly />
+            <MdPreview :modelValue="article.content" />
           </div>
 
           <!-- Footer: tags + like -->
@@ -137,7 +137,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from '@vueuse/head'
-import { MdEditor } from 'md-editor-v3'
+import { MdPreview } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import { getArticleBySlug, recordView, likeArticle, getArticleNeighbors } from '@/api/article'
 import { getMe } from '@/api/auth'
