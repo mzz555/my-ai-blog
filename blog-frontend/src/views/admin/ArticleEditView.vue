@@ -33,15 +33,15 @@
       <el-form-item label="封面图">
         <div style="display:flex;align-items:center;gap:12px">
           <img v-if="form.coverImage" :src="form.coverImage"
-            style="width:120px;height:70px;object-fit:cover;border-radius:4px;border:1px solid #2A2A3C" />
+            style="width:120px;height:67px;object-fit:cover;border-radius:4px;border:1px solid #2A2A3C" />
           <el-upload :before-upload="handleCoverUpload" :show-file-list="false" accept="image/*">
-            <el-button :loading="coverUploading" size="small">
-              {{ form.coverImage ? '更换封面' : '上传封面' }}
-            </el-button>
+            <el-button size="small">{{ form.coverImage ? '更换封面' : '上传封面' }}</el-button>
           </el-upload>
           <el-button v-if="form.coverImage" size="small" @click="form.coverImage = ''">移除</el-button>
         </div>
       </el-form-item>
+
+      <CoverCropDialog v-model:visible="cropDialogVisible" :file="cropFile" @done="onCropDone" />
       <el-form-item label="Slug">
         <el-input v-model="form.slug" placeholder="URL 路径（自动生成，可手动修改）" />
       </el-form-item>
@@ -51,6 +51,9 @@
       <el-form-item label="内容">
         <MdEditor v-model="form.content" style="width:100%" @onUploadImg="handleUpload" />
       </el-form-item>
+      <div v-if="wordCount > 0" class="word-count-bar">
+        {{ wordCount.toLocaleString() }} 字 · 约 {{ readingMinutes }} 分钟阅读
+      </div>
       <el-form-item>
         <el-checkbox v-model="form.isTop">置顶</el-checkbox>
         <el-checkbox v-model="form.allowComment" style="margin-left:16px">允许评论</el-checkbox>
@@ -73,6 +76,9 @@ import { getCategories } from '@/api/category'
 import { getTags } from '@/api/tag'
 import { uploadImage } from '@/api/upload'
 import { ElMessage } from 'element-plus'
+import { useArticleDraft, clearDraft } from '@/composables/useArticleDraft'
+import { useWordCount } from '@/composables/useWordCount'
+import CoverCropDialog from '@/components/admin/CoverCropDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -80,12 +86,18 @@ const isEdit = computed(() => !!route.params.id)
 const saving = ref(false)
 const categories = ref([])
 const tags = ref([])
-const coverUploading = ref(false)
+const cropDialogVisible = ref(false)
+const cropFile = ref(null)
 
 const form = reactive({
   title: '', slug: '', summary: '', content: '', coverImage: '',
   status: 'DRAFT', categoryId: null, tagNames: [], isTop: false, allowComment: true,
 })
+
+const contentRef = computed(() => form.content)
+const { wordCount, readingMinutes } = useWordCount(contentRef)
+
+useArticleDraft(form, isEdit)
 
 watch(() => form.title, (val) => {
   if (!isEdit.value && !form.slug) {
@@ -104,17 +116,14 @@ async function handleUpload(files, callback) {
   callback(results)
 }
 
-async function handleCoverUpload(file) {
-  coverUploading.value = true
-  try {
-    const res = await uploadImage(file.raw || file)
-    form.coverImage = res.data
-  } catch {
-    ElMessage.error('封面上传失败')
-  } finally {
-    coverUploading.value = false
-  }
+function handleCoverUpload(file) {
+  cropFile.value = file.raw || file
+  cropDialogVisible.value = true
   return false
+}
+
+function onCropDone(url) {
+  form.coverImage = url
 }
 
 async function handleSave() {
@@ -127,6 +136,7 @@ async function handleSave() {
       ElMessage.success('保存成功')
     } else {
       await createArticle(form)
+      clearDraft()
       ElMessage.success('发布成功')
       router.push('/admin/articles')
     }
@@ -164,3 +174,12 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.word-count-bar {
+  font-size: 12px;
+  color: #6E6E82;
+  padding: 4px 0 8px;
+  margin-left: 80px;
+}
+</style>
