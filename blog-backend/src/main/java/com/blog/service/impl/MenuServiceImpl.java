@@ -65,14 +65,19 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Override
     @Transactional
     public void delete(Long id) {
-        deleteRecursive(id);
+        if (this.getById(id) == null) throw new NotFoundException("菜单不存在");
+        Set<Long> toDelete = new LinkedHashSet<>();
+        collectDescendants(id, toDelete, new HashSet<>());
+        if (!toDelete.isEmpty()) {
+            this.removeByIds(toDelete);
+        }
     }
 
-    private void deleteRecursive(Long id) {
-        List<Menu> children = this.list(
-            Wrappers.<Menu>lambdaQuery().eq(Menu::getParentId, id));
-        children.forEach(c -> deleteRecursive(c.getId()));
-        this.removeById(id);
+    private void collectDescendants(Long id, Set<Long> toDelete, Set<Long> visited) {
+        if (!visited.add(id)) return;
+        toDelete.add(id);
+        this.list(Wrappers.<Menu>lambdaQuery().eq(Menu::getParentId, id))
+            .forEach(c -> collectDescendants(c.getId(), toDelete, visited));
     }
 
     private Menu toEntity(MenuDTO dto) {
