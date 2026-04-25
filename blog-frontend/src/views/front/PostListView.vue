@@ -30,7 +30,7 @@
       <div class="list-inner">
         <el-skeleton v-if="loading" :rows="6" animated />
         <template v-else>
-          <div class="article-list">
+          <div class="article-grid">
             <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
           </div>
           <el-empty v-if="!articles.length" description="暂无文章" />
@@ -133,48 +133,72 @@ onMounted(async () => {
 .list-inner {
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 40px 64px 64px;
+  padding: 0 0 64px;
 }
 
-.article-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 40px 64px;
+}
+@media (max-width: 1024px) {
+  .article-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .article-grid { grid-template-columns: 1fr; padding: 24px 20px; }
 }
 
 .pagination-wrap {
-  margin-top: 40px;
+  margin-top: 0;
+  padding: 0 64px 0;
   display: flex;
   justify-content: center;
 }
 
+:deep(.el-pagination .el-pager li.is-active) {
+  background: #E8A838;
+  color: #000;
+  border-radius: 6px;
+}
+:deep(.el-pagination .el-pager li) {
+  background: #13131E;
+  color: #9CA3AF;
+  border-radius: 6px;
+}
+:deep(.el-pagination button) {
+  background: #13131E;
+  color: #9CA3AF;
+}
+
 .filter-bar {
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
+  background: #13131E;
+  border-bottom: 1px solid #1C1C2C;
 }
 .filter-inner {
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: 16px 64px;
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
 }
 .filter-btn {
-  padding: 6px 16px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border);
-  background: transparent;
-  color: var(--color-text-secondary);
-  font-size: 13px;
-  font-weight: 500;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 6px;
+  border: none;
   cursor: pointer;
-  transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+  font-size: 13px;
+  background: #1E2030;
+  color: #D1D5DB;
+  transition: background 0.2s, color 0.2s;
 }
-.filter-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.filter-btn:hover:not(.active) { background: #2A2A40; }
 .filter-btn.active {
-  background: rgba(232,168,56,.12);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  background: #E8A838;
+  color: #000;
+  font-weight: 600;
 }
 </style>
