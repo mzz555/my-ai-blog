@@ -2,6 +2,7 @@ package com.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import java.util.List;
 
 /**
  * 菜单/权限实体，对应数据库 menus 表
@@ -44,6 +45,10 @@ public class Menu {
 
     /** 状态：1=启用，0=禁用 */
     private Integer status = 1;
+
+    /** 子菜单列表（非数据库字段，用于树形结构） */
+    @TableField(exist = false)
+    private List<Menu> children;
 
     /**
      * 菜单类型枚举
