@@ -130,6 +130,33 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     @Transactional(readOnly = true)
+    public ArticleNeighborsResponse getNeighbors(String slug) {
+        Article current = this.getOne(
+            Wrappers.<Article>lambdaQuery().eq(Article::getSlug, slug));
+        if (current == null) throw new NotFoundException("文章不存在");
+
+        Article prev = this.getOne(
+            Wrappers.<Article>lambdaQuery()
+                .eq(Article::getStatus, Article.ArticleStatus.PUBLISHED)
+                .lt(Article::getId, current.getId())
+                .orderByDesc(Article::getId)
+                .last("LIMIT 1"));
+
+        Article next = this.getOne(
+            Wrappers.<Article>lambdaQuery()
+                .eq(Article::getStatus, Article.ArticleStatus.PUBLISHED)
+                .gt(Article::getId, current.getId())
+                .orderByAsc(Article::getId)
+                .last("LIMIT 1"));
+
+        return new ArticleNeighborsResponse(
+            prev == null ? null : new ArticleNeighborsResponse.NeighborItem(prev.getTitle(), prev.getSlug()),
+            next == null ? null : new ArticleNeighborsResponse.NeighborItem(next.getTitle(), next.getSlug())
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ArticleDetailResponse getBySlug(String slug) {
         Article article = this.baseMapper.selectBySlugAndStatus(slug, ArticleStatus.PUBLISHED.name());
         if (article == null) throw new NotFoundException("文章不存在");

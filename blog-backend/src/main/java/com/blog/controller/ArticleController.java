@@ -75,6 +75,18 @@ public class ArticleController {
     }
 
     /**
+     * 获取上一篇/下一篇文章
+     * <p>GET /api/articles/{slug}/neighbors</p>
+     *
+     * @param slug 文章 URL slug
+     * @return 邻篇导航信息（prev/next）
+     */
+    @GetMapping("/{slug}/neighbors")
+    public Result<ArticleNeighborsResponse> neighbors(@PathVariable String slug) {
+        return Result.success(articleService.getNeighbors(slug));
+    }
+
+    /**
      * 根据 ID 查询文章（管理端编辑用）
      * GET /api/articles/admin/{id}
      */

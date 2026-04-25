@@ -78,5 +78,7 @@ public interface ArticleService extends IService<Article> {
 
     ArticleDetailResponse getByIdForAdmin(Long id);
 
+    ArticleNeighborsResponse getNeighbors(String slug);
+
     int like(Long id, String clientIp);
 }
