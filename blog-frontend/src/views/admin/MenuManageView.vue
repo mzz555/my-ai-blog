@@ -136,6 +136,8 @@ async function loadMenus() {
   try {
     const res = await getMenus()
     menus.value = res.data || []
+  } catch {
+    ElMessage.error('加载菜单失败，请刷新重试')
   } finally {
     loading.value = false
   }

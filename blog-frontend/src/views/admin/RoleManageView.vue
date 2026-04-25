@@ -57,7 +57,7 @@
         <div class="form-item">
           <label class="form-label">权限分配</label>
           <el-checkbox-group v-model="form.permissionCodes" class="perm-check-group">
-            <el-checkbox v-for="perm in allPermissions" :key="perm" :label="perm">{{ perm }}</el-checkbox>
+            <el-checkbox v-for="perm in allPermissions" :key="perm.code" :label="perm.code">{{ perm.label }}</el-checkbox>
           </el-checkbox-group>
         </div>
       </div>
@@ -84,8 +84,19 @@ const dialogVisible = ref(false)
 const editId = ref(null)
 
 const allPermissions = [
-  'article:read', 'article:write', 'article:delete',
-  'comment:manage', 'user:manage', 'role:manage'
+  { code: 'article:list',    label: '文章列表' },
+  { code: 'article:create',  label: '文章创建' },
+  { code: 'article:update',  label: '文章编辑' },
+  { code: 'article:delete',  label: '文章删除' },
+  { code: 'article:publish', label: '文章发布' },
+  { code: 'comment:list',    label: '评论列表' },
+  { code: 'comment:approve', label: '评论审核' },
+  { code: 'comment:delete',  label: '评论删除' },
+  { code: 'category:manage', label: '分类管理' },
+  { code: 'tag:manage',      label: '标签管理' },
+  { code: 'user:list',       label: '用户列表' },
+  { code: 'role:manage',     label: '角色管理' },
+  { code: 'menu:manage',     label: '菜单管理' },
 ]
 
 const form = reactive({ name: '', description: '', permissionCodes: [] })
