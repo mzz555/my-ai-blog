@@ -64,6 +64,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional
     public void deleteRole(Long id) {
+        if (this.getById(id) == null) throw new NotFoundException("角色不存在");
         roleMenuMapper.delete(Wrappers.<RoleMenu>lambdaQuery().eq(RoleMenu::getRoleId, id));
         this.removeById(id);
     }
