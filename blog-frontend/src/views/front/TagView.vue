@@ -43,11 +43,26 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { useHead } from '@vueuse/head'
 import { useRoute } from 'vue-router'
 import { getArticles } from '@/api/article'
 import ArticleCardGrid from '@/components/front/ArticleCardGrid.vue'
 
 const route = useRoute()
+
+const blogName = import.meta.env.VITE_BLOG_NAME || 'DevLog.'
+
+useHead({
+  title: () => `#${route.params.slug} | ${blogName}`,
+  meta: [
+    {
+      property: 'og:title',
+      content: () => `#${route.params.slug} | ${blogName}`,
+    },
+    { property: 'og:type', content: 'website' },
+  ],
+})
+
 const articles = ref([])
 const page = ref(1)
 const pageSize = 12
