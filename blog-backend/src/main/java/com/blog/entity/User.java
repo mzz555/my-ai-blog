@@ -34,6 +34,9 @@ public class User {
     /** 个人简介 */
     private String bio;
 
+    /** 用户昵称 */
+    private String nickname;
+
     /** 账号状态：1=正常，0=禁用 */
     private Integer status = 1;
 

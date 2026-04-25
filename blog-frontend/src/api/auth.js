@@ -5,3 +5,4 @@ export const register = (data) => request.post('/auth/register', data)
 export const getMe = () => request.get('/auth/me')
 export const refreshToken = (token) =>
   request.post('/auth/refresh', null, { params: { refreshToken: token } })
+export const updateProfile = (data) => request.patch('/auth/profile', data)

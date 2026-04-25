@@ -2,8 +2,10 @@ package com.blog.controller;
 
 import com.blog.common.PageResult;
 import com.blog.common.Result;
+import com.blog.dto.user.UserUpdateDTO;
 import com.blog.entity.User;
 import com.blog.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,5 +31,11 @@ public class UserController {
     public Result<Void> updateStatus(@PathVariable Long id, @RequestParam int status) {
         userService.updateStatus(id, status);
         return Result.success();
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('user:list')")
+    public Result<User> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
+        return Result.success(userService.updateUser(id, dto));
     }
 }

@@ -2,6 +2,7 @@ package com.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.blog.dto.auth.*;
+import com.blog.dto.auth.ProfileUpdateDTO;
 import com.blog.entity.User;
 
 /**
@@ -43,4 +44,13 @@ public interface AuthService extends IService<User> {
      * @return 包含新 accessToken 的响应
      */
     AuthResponse refreshToken(String refreshToken);
+
+    /**
+     * 更新当前用户个人资料
+     *
+     * @param username 当前用户名（从 JWT 中解析）
+     * @param dto      更新内容
+     * @return 更新后的用户信息 DTO
+     */
+    UserInfoResponse updateProfile(String username, ProfileUpdateDTO dto);
 }

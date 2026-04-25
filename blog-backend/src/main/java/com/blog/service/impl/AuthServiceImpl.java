@@ -2,7 +2,9 @@ package com.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.blog.common.exception.NotFoundException;
 import com.blog.dto.auth.*;
+import com.blog.dto.auth.ProfileUpdateDTO;
 import com.blog.entity.*;
 import com.blog.mapper.*;
 import com.blog.security.JwtUtil;
@@ -106,6 +108,16 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
                 .bio(user.getBio()).roles(roleCodes)
                 .permissions(permissions).menus(menuNodes)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public UserInfoResponse updateProfile(String username, ProfileUpdateDTO dto) {
+        User user = this.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, username));
+        if (user == null) throw new NotFoundException("用户不存在");
+        if (dto.getBio() != null) user.setBio(dto.getBio());
+        this.updateById(user);
+        return getCurrentUser(username);
     }
 
     @Override

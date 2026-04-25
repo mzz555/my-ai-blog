@@ -13,7 +13,7 @@
           <el-input v-model="form.bio" type="textarea" :rows="4" placeholder="介绍一下自己..." />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" disabled>保存（需后端 PATCH /api/users/profile 接口）</el-button>
+          <el-button type="primary" :loading="saving" @click="handleSave">保存</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -21,11 +21,28 @@
 </template>
 
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { updateProfile } from '@/api/auth'
+import { ElMessage } from 'element-plus'
 
 const userStore = useUserStore()
 const form = reactive({ username: '', email: '', bio: '' })
+
+const saving = ref(false)
+
+async function handleSave() {
+  saving.value = true
+  try {
+    await updateProfile({ bio: form.bio })
+    ElMessage.success('保存成功')
+    await userStore.fetchUserInfo()
+  } catch {
+    ElMessage.error('保存失败')
+  } finally {
+    saving.value = false
+  }
+}
 
 onMounted(() => {
   const info = userStore.userInfo

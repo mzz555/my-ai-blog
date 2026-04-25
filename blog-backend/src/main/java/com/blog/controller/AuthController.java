@@ -2,6 +2,7 @@ package com.blog.controller;
 
 import com.blog.common.Result;
 import com.blog.dto.auth.*;
+import com.blog.dto.auth.ProfileUpdateDTO;
 import com.blog.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -70,5 +71,12 @@ public class AuthController {
     @PostMapping("/refresh")
     public Result<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         return Result.success(authService.refreshToken(request.getRefreshToken()));
+    }
+
+    @PatchMapping("/profile")
+    public Result<UserInfoResponse> updateProfile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody ProfileUpdateDTO dto) {
+        return Result.success(authService.updateProfile(userDetails.getUsername(), dto));
     }
 }

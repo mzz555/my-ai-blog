@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN nickname VARCHAR(50) NULL COMMENT '用户昵称' AFTER bio;
