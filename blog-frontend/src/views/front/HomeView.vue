@@ -79,10 +79,23 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useHead } from '@vueuse/head'
 import { ElMessage } from 'element-plus'
 import { getArticles } from '@/api/article'
 import { formatDate } from '@/utils/format'
 import ArticleCardGrid from '@/components/front/ArticleCardGrid.vue'
+
+const blogName = import.meta.env.VITE_BLOG_NAME || 'DevLog.'
+
+useHead({
+  title: `${blogName} | 首页`,
+  meta: [
+    { name: 'description', content: '记录技术成长，分享工程实践。专注 Spring Boot、Vue 3 与云原生。' },
+    { property: 'og:title', content: `${blogName} | 首页` },
+    { property: 'og:description', content: '记录技术成长，分享工程实践。专注 Spring Boot、Vue 3 与云原生。' },
+    { property: 'og:type', content: 'website' },
+  ],
+})
 
 const articles = ref([])
 const loading = ref(false)
