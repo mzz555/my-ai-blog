@@ -39,12 +39,31 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { useHead } from '@vueuse/head'
 import { useRoute } from 'vue-router'
 import { getCategories } from '@/api/category'
 import { getArticles } from '@/api/article'
 import ArticleCard from '@/components/front/ArticleCard.vue'
 
 const route = useRoute()
+
+const blogName = import.meta.env.VITE_BLOG_NAME || 'DevLog.'
+
+useHead({
+  title: () => category.value
+    ? `${category.value.name} | ${blogName}`
+    : `分类 | ${blogName}`,
+  meta: [
+    {
+      property: 'og:title',
+      content: () => category.value
+        ? `${category.value.name} | ${blogName}`
+        : `分类 | ${blogName}`,
+    },
+    { property: 'og:type', content: 'website' },
+  ],
+})
+
 const articles = ref([])
 const category = ref(null)
 const loading = ref(false)
