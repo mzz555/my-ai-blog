@@ -144,6 +144,7 @@ import { getMe } from '@/api/auth'
 import { formatDateTime } from '@/utils/format'
 import CommentSection from '@/components/front/CommentSection.vue'
 
+const blogName = import.meta.env.VITE_BLOG_NAME || 'DevLog.'
 const route = useRoute()
 const article = ref(null)
 const headings = ref([])
@@ -201,7 +202,7 @@ onMounted(async () => {
     if (articleRes.status === 'fulfilled') {
       article.value = articleRes.value.data
       useHead({
-        title: `${article.value.title} - 技术博客`,
+        title: `${article.value.title} | ${blogName}`,
         meta: [
           { name: 'description', content: article.value.summary || article.value.title },
           { property: 'og:title', content: article.value.title },
