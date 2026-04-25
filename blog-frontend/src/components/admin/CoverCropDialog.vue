@@ -36,13 +36,14 @@ const imgRef = ref(null)
 const previewUrl = ref('')
 const uploading = ref(false)
 let cropper = null
+let cropperTimer = null
 
 watch(
   () => props.visible,
   (val) => {
     if (val && props.file) {
       previewUrl.value = URL.createObjectURL(props.file)
-      setTimeout(() => {
+      cropperTimer = setTimeout(() => {
         if (!imgRef.value) return
         cropper = new Cropper(imgRef.value, {
           aspectRatio: 16 / 9,
@@ -56,6 +57,7 @@ watch(
 )
 
 function destroyCropper() {
+  if (cropperTimer) { clearTimeout(cropperTimer); cropperTimer = null }
   if (cropper) { cropper.destroy(); cropper = null }
   if (previewUrl.value) { URL.revokeObjectURL(previewUrl.value); previewUrl.value = '' }
 }
@@ -68,8 +70,11 @@ async function handleConfirm() {
   if (!cropper) return
   uploading.value = true
   try {
-    const blob = await new Promise((resolve) =>
-      cropper.getCroppedCanvas().toBlob(resolve, 'image/jpeg', 0.9)
+    const blob = await new Promise((resolve, reject) =>
+      cropper.getCroppedCanvas().toBlob((b) => {
+        if (b) resolve(b)
+        else reject(new Error('Canvas toBlob returned null'))
+      }, 'image/jpeg', 0.9)
     )
     const res = await uploadImage(blob)
     emit('done', res.data)
