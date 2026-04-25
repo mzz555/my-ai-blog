@@ -27,8 +27,8 @@
           </span>
           <span class="hero-meta-sep">·</span>
           <span class="hero-meta-item">{{ formatDateTime(article.publishedAt) }}</span>
-          <span v-if="readTime" class="hero-meta-sep">·</span>
-          <span v-if="readTime" class="hero-meta-item">约 {{ readTime }} 分钟</span>
+          <span v-if="readingMinutes" class="hero-meta-sep">·</span>
+          <span v-if="readingMinutes" class="hero-meta-item">约 {{ readingMinutes }} 分钟</span>
         </div>
       </div>
     </section>
@@ -143,6 +143,7 @@ import { getArticleBySlug, recordView, likeArticle, getArticleNeighbors } from '
 import { getMe } from '@/api/auth'
 import { formatDateTime } from '@/utils/format'
 import CommentSection from '@/components/front/CommentSection.vue'
+import { useWordCount } from '@/composables/useWordCount'
 
 const blogName = import.meta.env.VITE_BLOG_NAME || 'DevLog.'
 const route = useRoute()
@@ -157,10 +158,8 @@ const neighbors = ref({ prev: null, next: null })
 const authorName = computed(() => userInfo.value?.nickname || userInfo.value?.username || '博主')
 const authorChar = computed(() => authorName.value.charAt(0))
 const authorBio = computed(() => userInfo.value?.bio || '专注于 Spring Boot、Vue 3 与云原生架构，记录技术成长历程。')
-const readTime = computed(() => {
-  if (!article.value?.content) return 0
-  return Math.max(1, Math.ceil(article.value.content.length / 300))
-})
+const articleContent = computed(() => article.value?.content || '')
+const { readingMinutes } = useWordCount(articleContent)
 
 function parseHeadings() {
   nextTick(() => {
