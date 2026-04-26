@@ -6,6 +6,7 @@ import java.util.List;
 @Data
 public class ArticleUpdateRequest {
     private String title;
+    private String slug;
     private String summary;
     private String content;
     private String coverImage;
@@ -13,4 +14,5 @@ public class ArticleUpdateRequest {
     private List<String> tagNames;
     private Boolean isTop;
     private Boolean allowComment;
+    private String status;
 }

@@ -80,12 +80,22 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (article == null) throw new NotFoundException("文章不存在");
 
         if (req.getTitle() != null) article.setTitle(req.getTitle());
+        if (req.getSlug() != null && !req.getSlug().isBlank()) article.setSlug(req.getSlug());
         if (req.getSummary() != null) article.setSummary(req.getSummary());
         if (req.getContent() != null) article.setContent(req.getContent());
         if (req.getCoverImage() != null) article.setCoverImage(req.getCoverImage());
         if (req.getIsTop() != null) article.setIsTop(req.getIsTop());
         if (req.getAllowComment() != null) article.setAllowComment(req.getAllowComment());
         if (req.getCategoryId() != null) article.setCategoryId(req.getCategoryId());
+        if (req.getStatus() != null) {
+            try {
+                ArticleStatus newStatus = ArticleStatus.valueOf(req.getStatus());
+                article.setStatus(newStatus);
+                if (newStatus == ArticleStatus.PUBLISHED && article.getPublishedAt() == null) {
+                    article.setPublishedAt(LocalDateTime.now());
+                }
+            } catch (IllegalArgumentException ignored) {}
+        }
 
         this.updateById(article);
 

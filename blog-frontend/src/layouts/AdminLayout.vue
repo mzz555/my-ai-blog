@@ -48,7 +48,11 @@
       </header>
 
       <main class="admin-main">
-        <router-view />
+        <router-view v-slot="{ Component, route }">
+          <Transition name="page-fade" mode="out-in">
+            <component :is="Component" :key="route.fullPath" />
+          </Transition>
+        </router-view>
       </main>
     </div>
   </div>
@@ -218,5 +222,21 @@ function handleLogout() {
   flex: 1;
   overflow-y: auto;
   padding: var(--space-6);
+  background: var(--color-bg-tertiary);
+}
+
+/* 页面过渡动画 */
+.page-fade-enter-active {
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.page-fade-leave-active {
+  transition: opacity 100ms ease;
+}
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.page-fade-leave-to {
+  opacity: 0;
 }
 </style>
