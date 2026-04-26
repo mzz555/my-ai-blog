@@ -226,8 +226,8 @@ onMounted(load)
   transition: opacity var(--transition-fast);
 }
 .act-btn:hover { opacity: 0.8; }
-.act-btn--edit { background: #1A1A28; border-color: #2A2A3C; color: #9CA3AF; }
-.act-btn--del  { background: #2D1A1A; border-color: #5B2626; color: #EF4444; }
+.act-btn--edit { background: var(--color-bg-secondary); border-color: var(--color-border); color: var(--color-text-secondary); }
+.act-btn--del  { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: var(--color-danger); }
 
 /* Dialog */
 .form-body { display: flex; flex-direction: column; gap: 16px; }
@@ -245,17 +245,4 @@ onMounted(load)
 }
 .dialog-footer { display: flex; justify-content: flex-end; gap: 10px; }
 
-:deep(.el-button--primary) {
-  background: #E8A838 !important;
-  border-color: #E8A838 !important;
-  color: #000 !important;
-  font-weight: 600;
-}
-:deep(.el-button--primary:hover) { background: #F0B840 !important; }
-:deep(.el-input__wrapper) {
-  background: #1A1A28 !important;
-  border-color: #2A2A3C !important;
-  box-shadow: none !important;
-}
-:deep(.el-input__inner) { color: #F0F0F8 !important; }
 </style>

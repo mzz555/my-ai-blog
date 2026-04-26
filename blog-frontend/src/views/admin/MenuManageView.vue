@@ -203,15 +203,14 @@ onMounted(loadMenus)
 </script>
 
 <style scoped>
-.mm-page { padding: var(--space-6); }
+.mm-page { display: flex; flex-direction: column; gap: 20px; }
 
 .page-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: var(--space-5);
 }
-.page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--color-text-primary); }
+.page-title { margin: 0 0 4px; font-size: 22px; font-weight: 700; color: var(--color-text-primary); }
 
 .btn-add {
   display: flex;
@@ -306,4 +305,6 @@ onMounted(loadMenus)
 .btn-save { background: var(--color-primary); color: #0C0C10; border: none; font-weight: 600; }
 .btn-save:hover:not(:disabled) { background: #F5BC50; }
 .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+:deep(.el-table__row) { height: 56px; }
 </style>

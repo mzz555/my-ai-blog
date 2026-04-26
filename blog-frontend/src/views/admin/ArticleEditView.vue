@@ -1,7 +1,9 @@
 <template>
-  <div>
-    <h2 style="margin-bottom:20px">{{ isEdit ? '编辑文章' : '写新文章' }}</h2>
-    <el-form :model="form" label-width="80px">
+  <div class="edit-wrap">
+    <div class="page-head">
+      <h2 class="page-title">{{ isEdit ? '编辑文章' : '写新文章' }}</h2>
+    </div>
+    <el-form :model="form" label-width="80px" class="edit-form">
       <el-form-item label="标题">
         <el-input v-model="form.title" placeholder="文章标题" size="large" />
       </el-form-item>
@@ -49,7 +51,7 @@
         <el-input v-model="form.summary" type="textarea" :rows="2" placeholder="文章摘要（SEO）" />
       </el-form-item>
       <el-form-item label="内容">
-        <MdEditor v-model="form.content" style="width:100%" @onUploadImg="handleUpload" />
+        <MdEditor v-model="form.content" :theme="editorTheme" style="width:100%" @onUploadImg="handleUpload" />
       </el-form-item>
       <div v-if="wordCount > 0" class="word-count-bar">
         {{ wordCount.toLocaleString() }} 字 · 约 {{ readingMinutes }} 分钟阅读
@@ -69,6 +71,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAppStore } from '@/stores/app'
 import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import { createArticle, updateArticle, getArticleById } from '@/api/article'
@@ -82,7 +85,9 @@ import CoverCropDialog from '@/components/admin/CoverCropDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
+const appStore = useAppStore()
 const isEdit = computed(() => !!route.params.id)
+const editorTheme = computed(() => appStore.darkMode ? 'dark' : 'light')
 const saving = ref(false)
 const categories = ref([])
 const tags = ref([])
@@ -177,9 +182,21 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.edit-wrap { display: flex; flex-direction: column; gap: 20px; }
+
+.page-head { display: flex; align-items: center; }
+.page-title { margin: 0; font-size: 22px; font-weight: 700; color: var(--color-text-primary); }
+
+.edit-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
 .word-count-bar {
   font-size: 12px;
-  color: #6E6E82;
+  color: var(--color-text-tertiary);
   padding: 4px 0 8px;
   margin-left: 80px;
 }

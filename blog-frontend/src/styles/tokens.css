@@ -183,3 +183,60 @@ a {
   --el-button-hover-border-color: #F5BC50 !important;
   --el-button-text-color: #0C0C10 !important;
 }
+
+/* ── Dialog ── */
+[data-theme='dark'] .el-dialog {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-lg) !important;
+}
+[data-theme='dark'] .el-dialog__header { border-bottom: 1px solid var(--color-border) !important; }
+[data-theme='dark'] .el-dialog__title { color: var(--color-text-primary) !important; font-weight: 600; }
+[data-theme='dark'] .el-dialog__close { color: var(--color-text-tertiary) !important; }
+[data-theme='dark'] .el-dialog__footer { border-top: 1px solid var(--color-border) !important; }
+
+/* ── Checkbox ── */
+[data-theme='dark'] .el-checkbox__inner {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+[data-theme='dark'] .el-checkbox__label { color: var(--color-text-primary) !important; }
+[data-theme='dark'] .el-checkbox.is-checked .el-checkbox__inner { background-color: var(--color-accent) !important; border-color: var(--color-accent) !important; }
+[data-theme='dark'] .el-checkbox.is-checked .el-checkbox__label { color: var(--color-accent) !important; }
+
+/* ── Switch ── */
+[data-theme='dark'] .el-switch__core { background-color: var(--color-border) !important; border-color: transparent !important; }
+[data-theme='dark'] .el-switch.is-checked .el-switch__core { background-color: var(--color-accent) !important; }
+
+/* ── Popover / Popconfirm ── */
+[data-theme='dark'] .el-popover,
+[data-theme='dark'] .el-popper {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme='dark'] .el-popconfirm__main { color: var(--color-text-primary) !important; }
+[data-theme='dark'] .el-popper__arrow::before { background: var(--color-surface) !important; border-color: var(--color-border) !important; }
+
+/* ── Dropdown menu ── */
+[data-theme='dark'] .el-dropdown-menu__item { color: var(--color-text-secondary) !important; }
+[data-theme='dark'] .el-dropdown-menu__item:hover,
+[data-theme='dark'] .el-dropdown-menu__item:focus { background-color: var(--color-surface-hover) !important; color: var(--color-text-primary) !important; }
+[data-theme='dark'] .el-dropdown-menu__item.is-divided { border-top-color: var(--color-border) !important; }
+
+/* ── Table (global deep dark) ── */
+[data-theme='dark'] .el-table {
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: var(--color-surface);
+  --el-table-header-text-color: var(--color-text-tertiary);
+  --el-table-text-color: var(--color-text-primary);
+  --el-table-border-color: var(--color-border);
+  --el-table-row-hover-bg-color: var(--color-surface-2);
+  background-color: transparent !important;
+}
+[data-theme='dark'] .el-table th.el-table__cell { background: var(--color-surface) !important; }
+[data-theme='dark'] .el-table tr:nth-child(even) { background: var(--color-bg-tertiary) !important; }
+[data-theme='dark'] .el-table tr:hover > td { background: var(--color-surface-2) !important; }
+[data-theme='dark'] .el-table td.el-table__cell { border-bottom-color: var(--color-border) !important; }
+[data-theme='dark'] .el-table th.el-table__cell { border-bottom-color: var(--color-border) !important; }

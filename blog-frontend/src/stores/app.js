@@ -4,7 +4,7 @@ import { ref, watch } from 'vue'
 export const useAppStore = defineStore('app', () => {
   const sidebarCollapsed = ref(false)
   const loading = ref(false)
-  const darkMode = ref(localStorage.getItem('theme') === 'dark')
+  const darkMode = ref(localStorage.getItem('theme') !== 'light')
 
   function toggleSidebar() { sidebarCollapsed.value = !sidebarCollapsed.value }
   function setLoading(val) { loading.value = val }

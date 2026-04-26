@@ -340,33 +340,11 @@ onMounted(() => {
   white-space: nowrap;
 }
 .act-btn:hover { opacity: 0.8; }
-.act-btn--approve { background: #14532D; border-color: #16A34A; color: #4ADE80; }
-.act-btn--reject  { background: transparent; border-color: #EF4444; color: #EF4444; }
-.act-btn--del     { background: #2D1A1A; border-color: #5B2626; color: #EF4444; }
+.act-btn--approve { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.3); color: var(--color-success); }
+.act-btn--reject  { background: transparent; border-color: rgba(239,68,68,.4); color: var(--color-danger); }
+.act-btn--del     { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: var(--color-danger); }
 
 .pagination-wrap { display: flex; justify-content: flex-end; }
 
-/* Pencil 表格深色覆盖 */
-:deep(.el-table) {
-  background: transparent !important;
-  color: #F0F0F8;
-}
-:deep(.el-table__header-wrapper th) {
-  background: #111119 !important;
-  color: #6E6E82;
-  font-weight: 500;
-  height: 44px;
-}
-:deep(.el-table__row) {
-  background: transparent !important;
-  height: 60px;
-}
-:deep(.el-table__row:nth-child(even)) {
-  background: #0D0D1A !important;
-}
-:deep(.el-table__row:hover td) {
-  background: #16162A !important;
-}
-:deep(.el-table td) { border-bottom: 1px solid #1C1C2C !important; }
-:deep(.el-table th) { border-bottom: 1px solid #1E1E2C !important; }
+:deep(.el-table__row) { height: 60px; }
 </style>

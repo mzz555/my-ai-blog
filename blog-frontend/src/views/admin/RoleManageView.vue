@@ -201,8 +201,8 @@ onMounted(loadRoles)
   white-space: nowrap;
 }
 .act-btn:hover { opacity: 0.8; }
-.act-btn--edit { background: #1A1A28; border-color: #2A2A3C; color: #9CA3AF; }
-.act-btn--del  { background: #2D1A1A; border-color: #5B2626; color: #EF4444; }
+.act-btn--edit { background: var(--color-bg-secondary); border-color: var(--color-border); color: var(--color-text-secondary); }
+.act-btn--del  { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: var(--color-danger); }
 
 .form-body { display: flex; flex-direction: column; gap: 16px; }
 .form-item { display: flex; flex-direction: column; gap: 6px; }
@@ -210,4 +210,6 @@ onMounted(loadRoles)
 .required { color: #ff4d4f; }
 .perm-check-group { display: flex; flex-wrap: wrap; gap: 8px; }
 .dialog-footer { display: flex; justify-content: flex-end; gap: 10px; }
+
+:deep(.el-table__row) { height: 56px; }
 </style>

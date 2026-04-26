@@ -211,17 +211,4 @@ onMounted(load)
 
 .dialog-footer { display: flex; justify-content: flex-end; gap: 10px; }
 
-:deep(.el-button--primary) {
-  background: #E8A838 !important;
-  border-color: #E8A838 !important;
-  color: #000 !important;
-  font-weight: 600;
-}
-:deep(.el-button--primary:hover) { background: #F0B840 !important; }
-:deep(.el-input__wrapper) {
-  background: #1A1A28 !important;
-  border-color: #2A2A3C !important;
-  box-shadow: none !important;
-}
-:deep(.el-input__inner) { color: #F0F0F8 !important; }
 </style>

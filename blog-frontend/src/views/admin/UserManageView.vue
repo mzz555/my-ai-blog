@@ -239,7 +239,7 @@ onMounted(async () => {
   white-space: nowrap;
 }
 .act-btn:hover { opacity: 0.8; }
-.act-btn--edit { background: #1A1A28; border-color: #2A2A3C; color: #9CA3AF; }
+.act-btn--edit { background: var(--color-bg-secondary); border-color: var(--color-border); color: var(--color-text-secondary); }
 
 .pagination-wrap { display: flex; justify-content: flex-end; }
 
@@ -249,44 +249,5 @@ onMounted(async () => {
 .role-check-group { display: flex; flex-wrap: wrap; gap: 8px; }
 .dialog-footer { display: flex; justify-content: flex-end; gap: 10px; }
 
-/* Pencil 表格深色覆盖 */
-:deep(.el-table) {
-  background: transparent !important;
-  color: #F0F0F8;
-}
-:deep(.el-table__header-wrapper th) {
-  background: #111119 !important;
-  color: #6E6E82;
-  font-weight: 500;
-  height: 44px;
-}
-:deep(.el-table__row) {
-  background: transparent !important;
-  height: 60px;
-}
-:deep(.el-table__row:nth-child(even)) {
-  background: #0D0D1A !important;
-}
-:deep(.el-table__row:hover td) {
-  background: #16162A !important;
-}
-:deep(.el-table td) { border-bottom: 1px solid #1C1C2C !important; }
-:deep(.el-table th) { border-bottom: 1px solid #1E1E2C !important; }
-:deep(.el-button--primary) {
-  background: #E8A838 !important;
-  border-color: #E8A838 !important;
-  color: #000 !important;
-  font-weight: 600;
-}
-:deep(.el-button--primary:hover) { background: #F0B840 !important; }
-:deep(.el-input__wrapper) {
-  background: #1A1A28 !important;
-  border-color: #2A2A3C !important;
-  box-shadow: none !important;
-}
-:deep(.el-input__inner) { color: #F0F0F8 !important; }
-:deep(.el-select .el-input__wrapper) {
-  background: #1A1A28 !important;
-  border-color: #2A2A3C !important;
-}
+:deep(.el-table__row) { height: 60px; }
 </style>
