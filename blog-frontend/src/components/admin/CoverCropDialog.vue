@@ -22,7 +22,6 @@
 <script setup>
 import { ref, watch, nextTick, onUnmounted } from 'vue'
 import Cropper from 'cropperjs'
-import 'cropperjs/dist/cropper.css'
 import { uploadImage } from '@/api/upload'
 import { ElMessage } from 'element-plus'
 
