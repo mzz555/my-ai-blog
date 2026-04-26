@@ -241,7 +241,13 @@ onMounted(async () => {
 .act-btn:hover { opacity: 0.8; }
 .act-btn--edit { background: var(--color-bg-secondary); border-color: var(--color-border); color: var(--color-text-secondary); }
 
-.pagination-wrap { display: flex; justify-content: flex-end; }
+.pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--color-border);
+}
 
 .form-body { display: flex; flex-direction: column; gap: 16px; }
 .form-item { display: flex; flex-direction: column; gap: 6px; }

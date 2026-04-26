@@ -307,4 +307,12 @@ onMounted(loadMenus)
 .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
 :deep(.el-table__row) { height: 56px; }
+
+.pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--color-border);
+}
 </style>

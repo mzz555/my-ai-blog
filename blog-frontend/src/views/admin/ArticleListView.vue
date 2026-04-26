@@ -325,7 +325,13 @@ onMounted(() => loadArticles())
 .act-btn--edit { background: var(--color-bg-secondary); border-color: var(--color-border); color: var(--color-text-secondary); }
 .act-btn--del  { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: var(--color-danger); }
 
-.pagination-wrap { display: flex; justify-content: flex-end; }
+.pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--color-border);
+}
 
 /* 删除弹窗内容 */
 .delete-body {

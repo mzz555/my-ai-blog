@@ -344,7 +344,13 @@ onMounted(() => {
 .act-btn--reject  { background: transparent; border-color: rgba(239,68,68,.4); color: var(--color-danger); }
 .act-btn--del     { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: var(--color-danger); }
 
-.pagination-wrap { display: flex; justify-content: flex-end; }
+.pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--color-border);
+}
 
 :deep(.el-table__row) { height: 60px; }
 </style>

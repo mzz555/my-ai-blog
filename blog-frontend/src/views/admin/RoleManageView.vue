@@ -10,7 +10,7 @@
       </el-button>
     </div>
 
-    <el-table :data="roles" v-loading="loading" class="data-table">
+    <el-table :data="pagedRoles" v-loading="loading" class="data-table">
       <el-table-column prop="id" label="ID" width="60" align="center" />
       <el-table-column prop="name" label="角色名" width="150" />
       <el-table-column prop="description" label="描述" min-width="160">
@@ -44,6 +44,17 @@
       </el-table-column>
     </el-table>
 
+    <div v-if="roles.length > pageSize" class="pagination-wrap">
+      <el-pagination
+        background
+        layout="total, prev, pager, next"
+        :total="roles.length"
+        :page-size="pageSize"
+        :current-page="page"
+        @current-change="(p) => page = p"
+      />
+    </div>
+
     <el-dialog v-model="dialogVisible" :title="editId ? '编辑角色' : '新建角色'" width="520px" destroy-on-close>
       <div class="form-body">
         <div class="form-item">
@@ -72,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { getRoles, createRole, updateRole, deleteRole } from '@/api/role'
@@ -82,6 +93,12 @@ const loading = ref(false)
 const saving = ref(false)
 const dialogVisible = ref(false)
 const editId = ref(null)
+const page = ref(1)
+const pageSize = 10
+const pagedRoles = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return roles.value.slice(start, start + pageSize)
+})
 
 const allPermissions = [
   { code: 'article:list',    label: '文章列表' },
@@ -210,6 +227,13 @@ onMounted(loadRoles)
 .required { color: #ff4d4f; }
 .perm-check-group { display: flex; flex-wrap: wrap; gap: 8px; }
 .dialog-footer { display: flex; justify-content: flex-end; gap: 10px; }
+.pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--color-border);
+}
 
 :deep(.el-table__row) { height: 56px; }
 </style>
