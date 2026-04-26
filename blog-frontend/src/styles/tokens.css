@@ -71,8 +71,8 @@
   --prose-max-width:        780px;
 }
 
-/* Dark theme */
-[data-theme='dark'] {
+/* Dark theme — 用 html[data-theme='dark'] 保证优先级(0,1,1)高于 EP 按需注入的 :root(0,1,0) */
+html[data-theme='dark'] {
   /* ── lightningcss 暗色激活（EP 2.6+ 用 light-dark() 编译后的 CSS 变量）── */
   --lightningcss-light: ;
   --lightningcss-dark:  initial;
