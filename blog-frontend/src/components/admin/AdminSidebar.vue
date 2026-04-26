@@ -109,7 +109,6 @@ function isActive(path) {
   background: #16162A;
   color: #9CA3AF;
 }
-.nav-item.router-link-active,
 .nav-item.active {
   background: #1E1E30;
   color: #E8A838;

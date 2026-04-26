@@ -134,6 +134,7 @@ async function handleSave() {
     if (isEdit.value) {
       await updateArticle(route.params.id, form)
       ElMessage.success('保存成功')
+      router.push('/admin/articles')
     } else {
       await createArticle(form)
       clearDraft()

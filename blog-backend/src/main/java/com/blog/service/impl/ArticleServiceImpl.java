@@ -189,11 +189,18 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<ArticleListResponse> listAll(int page, int size) {
-        Page<Article> pageData = this.page(
-                new Page<>(page, size),
-                Wrappers.<Article>lambdaQuery().orderByDesc(Article::getCreatedAt)
-        );
+    public PageResult<ArticleListResponse> listAll(int page, int size, String keyword, String status) {
+        var query = Wrappers.<Article>lambdaQuery();
+        if (keyword != null && !keyword.isBlank()) {
+            query.like(Article::getTitle, keyword.trim());
+        }
+        if (status != null && !status.isBlank()) {
+            try {
+                query.eq(Article::getStatus, Article.ArticleStatus.valueOf(status));
+            } catch (IllegalArgumentException ignored) {}
+        }
+        query.orderByDesc(Article::getCreatedAt);
+        Page<Article> pageData = this.page(new Page<>(page, size), query);
         fillAssociations(pageData.getRecords());
         List<ArticleListResponse> list = pageData.getRecords().stream()
                 .map(this::toListResponse)
@@ -259,6 +266,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (a.getTags() != null) {
             r.setTagNames(a.getTags().stream().map(Tag::getName).toList());
         }
+        r.setStatus(a.getStatus() != null ? a.getStatus().name() : "DRAFT");
         return r;
     }
 

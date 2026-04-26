@@ -58,8 +58,10 @@ public class ArticleController {
     @PreAuthorize("hasAuthority('article:list')")
     public Result<PageResult<ArticleListResponse>> adminList(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return Result.success(articleService.listAll(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status) {
+        return Result.success(articleService.listAll(page, size, keyword, status));
     }
 
     /**

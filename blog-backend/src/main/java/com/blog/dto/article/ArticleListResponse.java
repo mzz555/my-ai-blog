@@ -17,4 +17,5 @@ public class ArticleListResponse {
     private String categoryName;
     private List<String> tagNames;
     private String authorName;
+    private String status;
 }

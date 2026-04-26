@@ -34,19 +34,33 @@
 
     <!-- 表格 -->
     <el-table :data="articles" v-loading="loading" class="article-table">
-      <el-table-column prop="title" label="标题" min-width="240">
+      <!-- 封面 -->
+      <el-table-column label="封面" width="88">
         <template #default="{ row }">
-          <router-link :to="`/admin/articles/${row.id}/edit`" class="title-link">
-            {{ row.title }}
-          </router-link>
+          <div class="cover-cell">
+            <img v-if="row.coverImage" :src="row.coverImage" class="cover-thumb" />
+            <div v-else class="cover-placeholder"><el-icon><Picture /></el-icon></div>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column prop="categoryName" label="分类" width="100">
+
+      <!-- 标题 + 摘要 -->
+      <el-table-column label="文章" min-width="280">
         <template #default="{ row }">
-          <span class="cat-badge">{{ row.categoryName || '—' }}</span>
+          <div class="title-block">
+            <router-link :to="`/admin/articles/${row.id}/edit`" class="title-link">
+              {{ row.title }}
+            </router-link>
+            <p v-if="row.summary" class="summary-text">{{ row.summary }}</p>
+            <div class="meta-row">
+              <span v-if="row.categoryName" class="cat-chip">{{ row.categoryName }}</span>
+              <span v-for="tag in (row.tagNames || []).slice(0,2)" :key="tag" class="tag-chip">#{{ tag }}</span>
+            </div>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column prop="viewCount" label="阅读" width="80" align="center" />
+
+      <!-- 状态 -->
       <el-table-column label="状态" width="90" align="center">
         <template #default="{ row }">
           <span :class="['status-dot', row.status === 'PUBLISHED' ? 'status-dot--pub' : 'status-dot--draft']">
@@ -54,24 +68,31 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="发布时间" width="130">
+
+      <!-- 阅读量 -->
+      <el-table-column prop="viewCount" label="阅读" width="70" align="center">
+        <template #default="{ row }">
+          <span class="num-text">{{ row.viewCount ?? 0 }}</span>
+        </template>
+      </el-table-column>
+
+      <!-- 发布时间 -->
+      <el-table-column label="发布时间" width="112">
         <template #default="{ row }">
           <span class="date-text">{{ row.publishedAt ? formatDate(row.publishedAt) : '—' }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="190" fixed="right">
+
+      <!-- 操作 -->
+      <el-table-column label="操作" width="150" fixed="right">
         <template #default="{ row }">
           <div class="act-group">
             <button class="act-btn act-btn--edit" @click="$router.push(`/admin/articles/${row.id}/edit`)">
               <el-icon><Edit /></el-icon> 编辑
             </button>
-            <el-popconfirm title="确认删除该文章？" @confirm="handleDelete(row.id)">
-              <template #reference>
-                <button class="act-btn act-btn--del">
-                  <el-icon><Delete /></el-icon> 删除
-                </button>
-              </template>
-            </el-popconfirm>
+            <button class="act-btn act-btn--del" @click="openDelete(row)">
+              <el-icon><Delete /></el-icon> 删除
+            </button>
           </div>
         </template>
       </el-table-column>
@@ -87,15 +108,39 @@
         @current-change="loadArticles"
       />
     </div>
+
+    <!-- 删除确认弹窗 -->
+    <el-dialog
+      v-model="deleteDialogVisible"
+      title="删除文章"
+      width="420px"
+      :close-on-click-modal="false"
+      class="delete-dialog"
+    >
+      <div class="delete-body">
+        <div class="delete-icon-wrap">
+          <el-icon class="delete-icon"><Warning /></el-icon>
+        </div>
+        <p class="delete-msg">确定要删除文章</p>
+        <p class="delete-title-preview">「{{ deleteTarget?.title }}」</p>
+        <p class="delete-hint">此操作不可撤销，文章将被永久删除。</p>
+      </div>
+      <template #footer>
+        <div class="delete-footer">
+          <el-button @click="deleteDialogVisible = false">取消</el-button>
+          <el-button type="danger" :loading="deleting" @click="confirmDelete">确认删除</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getAdminArticles, togglePublish, deleteArticle } from '@/api/article'
+import { getAdminArticles, deleteArticle } from '@/api/article'
 import { formatDate } from '@/utils/format'
 import { ElMessage } from 'element-plus'
-import { Plus, Search, Edit, Delete, View, Hide } from '@element-plus/icons-vue'
+import { Plus, Search, Edit, Delete, Picture, Warning } from '@element-plus/icons-vue'
 
 const articles = ref([])
 const loading = ref(false)
@@ -104,6 +149,10 @@ const pageSize = 10
 const total = ref(0)
 const keyword = ref('')
 const statusFilter = ref('')
+
+const deleteDialogVisible = ref(false)
+const deleteTarget = ref(null)
+const deleting = ref(false)
 
 async function loadArticles(p = 1) {
   loading.value = true
@@ -120,20 +169,26 @@ async function loadArticles(p = 1) {
   }
 }
 
-function search() {
-  loadArticles(1)
+function search() { loadArticles(1) }
+
+function openDelete(row) {
+  deleteTarget.value = row
+  deleteDialogVisible.value = true
 }
 
-async function handlePublish(row) {
-  await togglePublish(row.id)
-  ElMessage.success(row.status === 'PUBLISHED' ? '已撤回为草稿' : '已发布')
-  loadArticles(page.value)
-}
-
-async function handleDelete(id) {
-  await deleteArticle(id)
-  ElMessage.success('已删除')
-  loadArticles(page.value)
+async function confirmDelete() {
+  if (!deleteTarget.value) return
+  deleting.value = true
+  try {
+    await deleteArticle(deleteTarget.value.id)
+    ElMessage.success('文章已删除')
+    deleteDialogVisible.value = false
+    loadArticles(page.value)
+  } catch {
+    ElMessage.error('删除失败，请重试')
+  } finally {
+    deleting.value = false
+  }
 }
 
 onMounted(() => loadArticles())
@@ -170,54 +225,92 @@ onMounted(() => loadArticles())
   gap: 10px;
   align-items: center;
 }
-
 .filter-input { max-width: 280px; }
 .filter-select { width: 130px; }
 
 .article-table { border-radius: var(--radius-lg); overflow: hidden; }
 
+/* 封面 */
+.cover-cell { width: 64px; height: 42px; }
+.cover-thumb {
+  width: 64px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #1C1C2C;
+  display: block;
+}
+.cover-placeholder {
+  width: 64px;
+  height: 42px;
+  border-radius: 4px;
+  background: #1C1C2E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3A3A5C;
+  font-size: 18px;
+}
+
+/* 标题块 */
+.title-block { display: flex; flex-direction: column; gap: 4px; padding: 4px 0; }
 .title-link {
   color: var(--color-text-primary);
   text-decoration: none;
-  font-weight: 500;
-  transition: color var(--transition-fast);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  transition: color 0.15s;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .title-link:hover { color: #E8A838; }
-
-.cat-badge {
+.summary-text {
+  margin: 0;
   font-size: 12px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.meta-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.cat-chip {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 3px;
+  background: #1C1C2E;
+  color: #9CA3AF;
+}
+.tag-chip {
+  font-size: 11px;
+  color: #4A4A6A;
 }
 
+/* 状态 */
 .status-dot {
   display: inline-flex;
   align-items: center;
   font-size: 11px;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
+  padding: 3px 8px;
+  border-radius: 20px;
 }
-.status-dot--pub {
-  background: #1A2010;
-  color: #6FCF97;
-  border: none;
-}
-.status-dot--draft {
-  background: #1A1028;
-  color: #9CA3AF;
-  border: none;
-}
+.status-dot--pub { background: #1A2010; color: #6FCF97; }
+.status-dot--draft { background: #1A1028; color: #9CA3AF; }
 
-.date-text {
-  font-size: 12px;
-  color: var(--color-text-tertiary);
-}
+.num-text { font-size: 13px; color: var(--color-text-secondary); }
+.date-text { font-size: 12px; color: var(--color-text-tertiary); }
 
-.act-group { display: flex; gap: 8px; align-items: center; }
+/* 操作按钮 */
+.act-group { display: flex; gap: 6px; align-items: center; }
 .act-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   height: 28px;
   padding: 0 10px;
   border-radius: 6px;
@@ -225,39 +318,60 @@ onMounted(() => loadArticles())
   font-weight: 500;
   cursor: pointer;
   border: 1px solid;
-  transition: opacity var(--transition-fast);
+  transition: opacity 0.15s;
   white-space: nowrap;
 }
-.act-btn:hover { opacity: 0.8; }
+.act-btn:hover { opacity: 0.75; }
 .act-btn--edit { background: #1A1A28; border-color: #2A2A3C; color: #9CA3AF; }
 .act-btn--del  { background: #2D1A1A; border-color: #5B2626; color: #EF4444; }
 
-.pagination-wrap {
-  display: flex;
-  justify-content: flex-end;
-}
+.pagination-wrap { display: flex; justify-content: flex-end; }
 
-/* Pencil 表格深色覆盖 */
-:deep(.el-table) {
-  background: transparent !important;
-  color: #F0F0F8;
+/* 删除弹窗内容 */
+.delete-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0 8px;
+  text-align: center;
 }
+.delete-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #2D1A1A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.delete-icon { font-size: 26px; color: #EF4444; }
+.delete-msg { margin: 0; font-size: 15px; color: var(--color-text-primary); font-weight: 500; }
+.delete-title-preview {
+  margin: 0;
+  font-size: 14px;
+  color: #E8A838;
+  font-weight: 600;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.delete-hint { margin: 0; font-size: 12px; color: var(--color-text-tertiary); }
+.delete-footer { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Element Plus 深色覆盖 */
+:deep(.el-table) { background: transparent !important; color: #F0F0F8; }
 :deep(.el-table__header-wrapper th) {
   background: #111119 !important;
   color: #6E6E82;
   font-weight: 500;
   height: 44px;
 }
-:deep(.el-table__row) {
-  background: transparent !important;
-  height: 60px;
-}
-:deep(.el-table__row:nth-child(even)) {
-  background: #0D0D1A !important;
-}
-:deep(.el-table__row:hover td) {
-  background: #16162A !important;
-}
+:deep(.el-table__row) { background: transparent !important; height: 68px; }
+:deep(.el-table__row:nth-child(even)) { background: #0D0D1A !important; }
+:deep(.el-table__row:hover td) { background: #16162A !important; }
 :deep(.el-table td) { border-bottom: 1px solid #1C1C2C !important; }
 :deep(.el-table th) { border-bottom: 1px solid #1E1E2C !important; }
 :deep(.el-button--primary) {
@@ -267,6 +381,11 @@ onMounted(() => loadArticles())
   font-weight: 600;
 }
 :deep(.el-button--primary:hover) { background: #F0B840 !important; }
+:deep(.el-button--danger) {
+  background: #EF4444 !important;
+  border-color: #EF4444 !important;
+  color: #fff !important;
+}
 :deep(.el-input__wrapper) {
   background: #1A1A28 !important;
   border-color: #2A2A3C !important;
@@ -276,5 +395,21 @@ onMounted(() => loadArticles())
 :deep(.el-select .el-input__wrapper) {
   background: #1A1A28 !important;
   border-color: #2A2A3C !important;
+}
+:deep(.el-dialog) {
+  background: #13131E !important;
+  border: 1px solid #1C1C2C;
+  border-radius: 12px !important;
+}
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid #1C1C2C;
+  padding: 16px 20px;
+}
+:deep(.el-dialog__title) { color: #F0F0F8; font-weight: 600; }
+:deep(.el-dialog__headerbtn .el-dialog__close) { color: #6E6E82; }
+:deep(.el-dialog__body) { padding: 20px; }
+:deep(.el-dialog__footer) {
+  border-top: 1px solid #1C1C2C;
+  padding: 14px 20px;
 }
 </style>
