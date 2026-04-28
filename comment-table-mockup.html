@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>评论审核 — 表格布局预览 v2</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0C0C18;
+    color: #E2E2F0;
+    padding: 32px;
+    min-height: 100vh;
+  }
+
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .sub { font-size: 13px; color: #6B6B8A; margin-bottom: 20px; }
+
+  .table-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #1E1E30;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  thead tr {
+    background: #13131E;
+    border-bottom: 1px solid #1E1E30;
+  }
+  thead th {
+    padding: 12px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B6B8A;
+    text-align: left;
+    white-space: nowrap;
+  }
+  thead th.center { text-align: center; }
+
+  tbody tr {
+    border-bottom: 1px solid #141420;
+    background: #0F0F1A;
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: #131322; }
+  tbody tr:last-child { border-bottom: none; }
+
+  td { padding: 14px 14px; vertical-align: middle; }
+  td.center { text-align: center; }
+
+  /* 序号 */
+  .seq { font-size: 12px; color: #4A4A6A; font-variant-numeric: tabular-nums; }
+
+  /* 所属文章 */
+  .article-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #9CA3AF;
+    text-decoration: none;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid #1E1E30;
+    border-radius: 6px;
+    padding: 4px 9px;
+    background: #13131E;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .article-link:hover { border-color: #E8A838; color: #E8A838; }
+
+  /* 评论者 */
+  .user-cell { display: flex; align-items: center; gap: 8px; }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #E8A838; color: #0C0C10;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .avatar.guest { background: #2A2A3C; color: #6B6B8A; }
+  .username { font-size: 13px; font-weight: 500; color: #D1D1E9; }
+  .user-type { font-size: 10px; color: #4A4A6A; margin-top: 1px; }
+
+  /* 内容 */
+  .content-cell { display: flex; flex-direction: column; gap: 3px; }
+  .reply-hint { font-size: 11px; color: #4A4A6A; }
+  .reply-name { color: #E8A838; font-weight: 600; }
+  .comment-text {
+    font-size: 13px; color: #9CA3AF; line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 240px;
+  }
+
+  /* 根评论列 — 统一徽章样式 */
+  .root-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  /* 根评论：紫色 */
+  .root-badge.is-root {
+    background: rgba(99,102,241,.12);
+    color: #818CF8;
+    border: 1px solid rgba(99,102,241,.25);
+  }
+  /* 回复评论：青色 */
+  .root-badge.is-reply {
+    background: rgba(20,184,166,.10);
+    color: #2DD4BF;
+    border: 1px solid rgba(20,184,166,.25);
+  }
+
+  /* 状态 */
+  .badge {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .badge-pending  { background: rgba(232,168,56,.12); color: #E8A838; border: 1px solid rgba(232,168,56,.25); }
+  .badge-approved { background: rgba(52,199,89,.12);  color: #34C759; border: 1px solid rgba(52,199,89,.25); }
+  .badge-rejected { background: rgba(255,77,79,.10);  color: #ff4d4f; border: 1px solid rgba(255,77,79,.20); }
+
+  /* 时间 */
+  .date { font-size: 11px; color: #4A4A6A; white-space: nowrap; line-height: 1.7; }
+
+  /* 操作 */
+  .actions { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 3px;
+    height: 26px; padding: 0 9px;
+    border-radius: 6px; font-size: 11px; font-weight: 500;
+    cursor: pointer; border: 1px solid; white-space: nowrap;
+    transition: opacity .15s;
+  }
+  .btn:hover { opacity: 0.75; }
+  .btn-view    { background: #13131E; border-color: #2A2A3C; color: #9CA3AF; }
+  .btn-approve { background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.3); color: #22C55E; }
+  .btn-reject  { background: transparent; border-color: rgba(239,68,68,.35); color: #EF4444; }
+  .btn-del     { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.25); color: #EF4444; }
+
+  /* 分页 */
+  .pagination {
+    display: flex; justify-content: flex-end; align-items: center;
+    padding: 14px 16px; gap: 6px;
+    border-top: 1px solid #1E1E30;
+    background: #0F0F1A;
+  }
+  .page-btn {
+    min-width: 30px; height: 30px; border-radius: 6px;
+    border: 1px solid #1E1E30; background: #13131E;
+    color: #6B6B8A; font-size: 12px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .page-btn.active { background: #E8A838; border-color: #E8A838; color: #0C0C10; font-weight: 700; }
+  .page-total { font-size: 12px; color: #4A4A6A; margin-right: 8px; }
+
+  .label-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 4px; vertical-align: middle; margin-left: 5px;
+  }
+  .new-tag   { background: rgba(232,168,56,.2); color: #E8A838; }
+  .exist-tag { background: rgba(99,102,241,.15); color: #818CF8; }
+</style>
+</head>
+<body>
+
+<h2>评论审核 <span class="label-tag new-tag">v2 PREVIEW</span></h2>
+<p class="sub">共 48 条评论</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="center" style="width:48px">#</th>
+        <th style="width:148px">所属文章</th>
+        <th style="width:118px">评论者</th>
+        <th style="min-width:200px">内容</th>
+        <th class="center" style="width:100px">根评论</th>
+        <th class="center" style="width:88px">状态</th>
+        <th style="width:84px">时间</th>
+        <th style="width:195px">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- 行1: 根评论，待审核 -->
+      <tr>
+        <td class="center"><span class="seq">1</span></td>
+        <td>
+          <a class="article-link" href="#">📄 Vue3 响应式原理</a>
+        </td>
+        <td>
+          <div class="user-cell">
+            <div class="avatar">张</div>
+            <div>
+              <div class="username">张三</div>
+              <div class="user-type">注册用户</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="content-cell">
+            <p class="comment-text">这篇文章写得非常好，对 Vue3 响应式原理讲得很清晰，终于弄明白了。</p>
+          </div>
+        </td>
+        <td class="center">
+          <span class="root-badge is-root">⬛ 根评论</span>
+        </td>
+        <td class="center"><span class="badge badge-pending">待审核</span></td>
+        <td><span class="date">2026-04-25<br>14:32</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-view">查看</button>
+            <button class="btn btn-approve">✓ 通过</button>
+            <button class="btn btn-reject">✕ 拒绝</button>
+            <button class="btn btn-del">删除</button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 行2: 回复评论，已通过 -->
+      <tr>
+        <td class="center"><span class="seq">2</span></td>
+        <td>
+          <a class="article-link" href="#">📄 Vue3 响应式原理</a>
+        </td>
+        <td>
+          <div class="user-cell">
+            <div class="avatar guest">李</div>
+            <div>
+              <div class="username">李四</div>
+              <div class="user-type">游客</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="content-cell">
+            <p class="reply-hint">回复 <span class="reply-name">@张三</span></p>
+            <p class="comment-text">同感！我之前也是看了很多资料都没搞懂，这篇算是讲得最清楚的了。</p>
+          </div>
+        </td>
+        <td class="center">
+          <span class="root-badge is-reply">↩ 回复</span>
+        </td>
+        <td class="center"><span class="badge badge-approved">已通过</span></td>
+        <td><span class="date">2026-04-25<br>15:10</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-view">查看</button>
+            <button class="btn btn-reject">✕ 拒绝</button>
+            <button class="btn btn-del">删除</button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 行3: 根评论，已拒绝 -->
+      <tr>
+        <td class="center"><span class="seq">3</span></td>
+        <td>
+          <a class="article-link" href="#">📄 TypeScript 进阶指南</a>
+        </td>
+        <td>
+          <div class="user-cell">
+            <div class="avatar" style="background:#818CF8">W</div>
+            <div>
+              <div class="username">wangwu</div>
+              <div class="user-type">注册用户</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="content-cell">
+            <p class="comment-text">垃圾文章，一点都不好看，纯粹浪费时间，不推荐。</p>
+          </div>
+        </td>
+        <td class="center">
+          <span class="root-badge is-root">⬛ 根评论</span>
+        </td>
+        <td class="center"><span class="badge badge-rejected">已拒绝</span></td>
+        <td><span class="date">2026-04-24<br>09:15</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-view">查看</button>
+            <button class="btn btn-approve">✓ 通过</button>
+            <button class="btn btn-del">删除</button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 行4: 深层回复，待审核 -->
+      <tr>
+        <td class="center"><span class="seq">4</span></td>
+        <td>
+          <a class="article-link" href="#">📄 Vue3 响应式原理</a>
+        </td>
+        <td>
+          <div class="user-cell">
+            <div class="avatar guest">赵</div>
+            <div>
+              <div class="username">赵六</div>
+              <div class="user-type">游客</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="content-cell">
+            <p class="reply-hint">回复 <span class="reply-name">@李四</span></p>
+            <p class="comment-text">赞同，而且作者还在评论区回复了大家的问题，很负责任。</p>
+          </div>
+        </td>
+        <td class="center">
+          <span class="root-badge is-reply">↩ 回复</span>
+        </td>
+        <td class="center"><span class="badge badge-pending">待审核</span></td>
+        <td><span class="date">2026-04-25<br>16:44</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-view">查看</button>
+            <button class="btn btn-approve">✓ 通过</button>
+            <button class="btn btn-reject">✕ 拒绝</button>
+            <button class="btn btn-del">删除</button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 行5: 根评论，已通过 -->
+      <tr>
+        <td class="center"><span class="seq">5</span></td>
+        <td>
+          <a class="article-link" href="#">📄 CSS Grid 完全指南</a>
+        </td>
+        <td>
+          <div class="user-cell">
+            <div class="avatar" style="background:#34C759;color:#0C0C10">S</div>
+            <div>
+              <div class="username">sunqi</div>
+              <div class="user-type">注册用户</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="content-cell">
+            <p class="comment-text">Grid 布局配合这篇文章的例子练习效果很好，收藏了！</p>
+          </div>
+        </td>
+        <td class="center">
+          <span class="root-badge is-root">⬛ 根评论</span>
+        </td>
+        <td class="center"><span class="badge badge-approved">已通过</span></td>
+        <td><span class="date">2026-04-23<br>20:01</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-view">查看</button>
+            <button class="btn btn-reject">✕ 拒绝</button>
+            <button class="btn btn-del">删除</button>
+          </div>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <span class="page-total">共 48 条</span>
+    <button class="page-btn">‹</button>
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">3</button>
+    <button class="page-btn">4</button>
+    <button class="page-btn">5</button>
+    <button class="page-btn">›</button>
+  </div>
+</div>
+
+<div style="margin-top:24px; padding:16px; background:#13131E; border-radius:10px; border:1px solid #1E1E30; display:flex; gap:24px; flex-wrap:wrap;">
+  <div>
+    <p style="font-size:11px;color:#6B6B8A;margin-bottom:8px;font-weight:700;">根评论列说明</p>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="root-badge is-root" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(99,102,241,.12);color:#818CF8;border:1px solid rgba(99,102,241,.25);">⬛ 根评论</span>
+        <span style="font-size:12px;color:#4A4A6A">紫色 — 顶级评论，无父级</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="root-badge is-reply" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(20,184,166,.10);color:#2DD4BF;border:1px solid rgba(20,184,166,.25);">↩ 回复</span>
+        <span style="font-size:12px;color:#4A4A6A">青色 — 回复某条评论</span>
+      </div>
+    </div>
+  </div>
+  <div>
+    <p style="font-size:11px;color:#6B6B8A;margin-bottom:8px;font-weight:700;">操作列说明</p>
+    <p style="font-size:12px;color:#4A4A6A;line-height:1.8;">
+      「查看」— 跳转前台文章评论区定位到该条<br>
+      「通过/拒绝」— 已是该状态时隐藏对应按钮<br>
+      「删除」— 始终显示
+    </p>
+  </div>
+</div>
+
+</body>
+</html>

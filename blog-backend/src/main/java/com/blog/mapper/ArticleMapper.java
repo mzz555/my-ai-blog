@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章数据访问层
@@ -39,6 +40,9 @@ public interface ArticleMapper extends BaseMapper<Article> {
             "WHERE a.status = 'PUBLISHED' AND t.slug = #{tagSlug}")
     List<Long> selectIdsByTagSlug(@Param("tagSlug") String tagSlug);
 
+    @Select("SELECT article_id FROM article_tags WHERE tag_id = #{tagId}")
+    List<Long> selectIdsByTagId(@Param("tagId") Long tagId);
+
     /**
      * 原子地增加文章浏览量（用于 Redis 定期同步）
      *
@@ -70,4 +74,10 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     @Update("UPDATE articles SET like_count = like_count + 1 WHERE id = #{id}")
     void incrementLikeCount(@Param("id") Long id);
+
+    @Select("SELECT DATE(published_at) AS date, COUNT(*) AS count " +
+            "FROM articles " +
+            "WHERE status = 'PUBLISHED' AND published_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) " +
+            "GROUP BY DATE(published_at) ORDER BY date ASC")
+    List<Map<String, Object>> countPublishedByDayLast7();
 }

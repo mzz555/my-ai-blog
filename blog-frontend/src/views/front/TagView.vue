@@ -144,9 +144,9 @@ watch(() => route.params.slug, () => load())
   margin-bottom: 4px;
 }
 .bc-link { color: var(--color-text-secondary); text-decoration: none; transition: color var(--transition-fast); }
-.bc-link:hover { color: var(--color-primary); }
+.bc-link:hover { color: var(--color-accent); }
 .bc-sep { color: var(--color-text-muted); }
-.bc-current { color: var(--color-primary); font-weight: 500; }
+.bc-current { color: var(--color-accent); font-weight: 500; }
 
 .back-row { margin-top: 32px; }
 .back-link {
@@ -155,5 +155,5 @@ watch(() => route.params.slug, () => load())
   text-decoration: none;
   transition: color var(--transition-fast);
 }
-.back-link:hover { color: var(--color-primary); }
+.back-link:hover { color: var(--color-accent); }
 </style>

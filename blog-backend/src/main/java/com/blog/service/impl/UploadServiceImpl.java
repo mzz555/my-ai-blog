@@ -1,41 +1,35 @@
 package com.blog.service.impl;
 
 import com.blog.service.UploadService;
-import io.minio.*;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UploadServiceImpl implements UploadService {
 
-    private final MinioClient minioClient;
-    @Value("${minio.bucket}") private String bucket;
-    @Value("${minio.endpoint}") private String endpoint;
+    @Value("${upload.dir:uploads}") private String uploadDir;
 
     @Override
     public String uploadImage(MultipartFile file) {
         validateImage(file);
         String ext = getExtension(file.getOriginalFilename());
-        String objectName = "images/" + UUID.randomUUID() + "." + ext;
+        String filename = UUID.randomUUID() + "." + ext;
+        Path dir = Paths.get(uploadDir, "images").toAbsolutePath();
         try {
-            ensureBucketExists();
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(bucket)
-                    .object(objectName)
-                    .stream(file.getInputStream(), file.getSize(), -1)
-                    .contentType(file.getContentType())
-                    .build());
-            return endpoint + "/" + bucket + "/" + objectName;
-        } catch (Exception e) {
-            log.error("MinIO 上传失败", e);
+            Files.createDirectories(dir);
+            file.transferTo(dir.resolve(filename).toFile());
+        } catch (IOException e) {
+            log.error("本地文件上传失败: {}", e.getMessage());
             throw new RuntimeException("文件上传失败");
         }
+        return "/uploads/images/" + filename;
     }
 
     private void validateImage(MultipartFile file) {
@@ -50,10 +44,5 @@ public class UploadServiceImpl implements UploadService {
     private String getExtension(String filename) {
         if (filename == null || !filename.contains(".")) return "jpg";
         return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
-    }
-
-    private void ensureBucketExists() throws Exception {
-        boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
-        if (!exists) minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
     }
 }

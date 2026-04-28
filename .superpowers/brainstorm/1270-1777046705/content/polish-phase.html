@@ -1,0 +1,187 @@
+<h2>Polish 阶段设计</h2>
+<p class="subtitle">对照 Pencil 设计稿，逐页修正 UI 细节——颜色、间距、字重、交互状态</p>
+
+<div class="section">
+  <h3>一、前台公共组件</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+
+    <div style="flex:1;min-width:300px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">导航栏（FrontLayout Navbar）</div>
+      <div style="margin-top:8px;background:#0C0C10;border-radius:6px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:48px">
+        <span style="color:#E8A838;font-size:16px;font-weight:700">MyBlog</span>
+        <div style="display:flex;gap:20px">
+          <span style="color:#F0F0F8;font-size:12px;font-weight:600">首页</span>
+          <span style="color:#9CA3AF;font-size:12px">博客</span>
+          <span style="color:#9CA3AF;font-size:12px">归档</span>
+          <span style="color:#9CA3AF;font-size:12px">关于</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <span style="color:#9CA3AF;font-size:12px">🔍</span>
+          <span style="background:#E8A838;color:#000;font-size:11px;font-weight:600;padding:4px 12px;border-radius:4px">后台</span>
+        </div>
+      </div>
+      <ul style="margin-top:10px;color:#F0F0F8;font-size:12px;line-height:2;padding-left:16px">
+        <li>高度 72px，水平内边距 48px，导航间距 gap: 32px</li>
+        <li>激活项：#E8A838 / 600；非激活：#9CA3AF / normal</li>
+        <li>Logo：22-24px / 700 / #E8A838</li>
+        <li>分割线：#1C1C2C / 1px（导航栏底部）</li>
+        <li>ThemeToggle 图标：#6E6E82 / 18px</li>
+      </ul>
+    </div>
+
+    <div style="flex:1;min-width:300px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">文章卡片（ArticleCard）</div>
+      <div style="margin-top:8px;background:#13131E;border-radius:6px;overflow:hidden;border:1px solid #1C1C2C">
+        <div style="background:#1C1C2E;height:80px;display:flex;align-items:center;justify-content:center;color:#3A3A5C;font-size:11px">封面图 140px</div>
+        <div style="padding:14px 14px 10px">
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <span style="background:#1C1C2E;color:#8A8A9E;font-size:10px;padding:2px 8px;border-radius:3px">Vue3</span>
+          </div>
+          <div style="color:#F0F0F8;font-size:13px;font-weight:600;line-height:1.4">文章标题文字最多两行</div>
+          <div style="color:#8A8A9E;font-size:11px;margin-top:6px">2024-01-15 · 5 分钟阅读</div>
+        </div>
+      </div>
+      <ul style="margin-top:10px;color:#F0F0F8;font-size:12px;line-height:2;padding-left:16px">
+        <li>卡片背景：#13131E，圆角 8px</li>
+        <li>封面图区域：高度 140px（大卡）/ 130px（小卡）</li>
+        <li>卡片内边距：padding [20,20,16,20]</li>
+        <li>3列网格，行间距 gap: 24px，区域 padding [40,64]</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>二、文章详情页（PostDetailView）</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">Hero 区域</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:12px;line-height:2;padding-left:16px">
+        <li>封面大图：高度 420px，全宽覆盖</li>
+        <li>内容叠层：宽 860px，padding [60,0,48,64]</li>
+        <li>面包屑：12px / #6E6E82，激活项 #E8A838</li>
+        <li>标签 chip：#1C1C2E 背景，padding [4,12]</li>
+        <li>标题：44px / 700 / #F0F0F8，宽 780px</li>
+        <li>元数据行：gap 20px，分割竖线 #2A2A40</li>
+      </ul>
+    </div>
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">正文 + 特殊元素</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:12px;line-height:2;padding-left:16px">
+        <li>正文区：padding [48,64]，gap 40px</li>
+        <li>正文字号：15px / #A0A0B8</li>
+        <li>代码块：#0F0F1C 背景，标题栏 #16162A</li>
+        <li>引用块：#111120 背景，左边框 3px #E8A838</li>
+        <li>点赞栏：#13131E，padding [20,24]</li>
+        <li>邻篇区：文章底部，#13131E 卡片，←/→ 方向标</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>三、后台通用样式（AdminLayout + 所有管理页）</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+    <div style="min-width:200px;background:#111119;border-radius:8px;padding:14px;border:1px solid #1E1E2C">
+      <div class="label">侧边栏规格</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:12px;line-height:2;padding-left:16px">
+        <li>宽度：240px</li>
+        <li>Logo 区：高 64px，gap 10px</li>
+        <li>图标方块：32×32 / #E8A838</li>
+        <li>菜单项高：40px，padding [0,8]，gap 10px</li>
+        <li>激活项背景：#1E1E30</li>
+        <li>激活项图标/文字：#E8A838 / 600</li>
+        <li>非激活：#6E6E82 / normal</li>
+        <li>分割线：#1E1E2C / 1px</li>
+        <li>底部用户栏：头像 32px ellipse #E8A838</li>
+      </ul>
+    </div>
+    <div style="flex:1;min-width:260px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">页面主体（Topbar + Table）</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:12px;line-height:2;padding-left:16px">
+        <li>Topbar 高：64px，背景 #111119</li>
+        <li>页面标题：18px / 700 / #F9FAFB</li>
+        <li>工具栏高：56px，搜索框/下拉 #1A1A28 / 高36px</li>
+        <li>表头背景：#111119，高 44px</li>
+        <li>数据行高：60px，交替行 #0D0D1A</li>
+        <li>操作按钮：gap 8px，编辑 #1A1A28，删除 #2A1010</li>
+        <li>主色按钮：#E8A838 bg，#000/#0C0C10 文字，高 36px，padding [0,16]</li>
+        <li>状态 badge：发布=#1A2010+#6FCF97，草稿=#1A1028+#9CA3AF</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>四、空状态 / 错误状态 / 加载（统一组件）</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+    <div style="flex:1;min-width:220px;background:#13131E;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:28px;margin:8px 0">📭</div>
+      <div style="color:#F0F0F8;font-size:13px;font-weight:600">暂无数据</div>
+      <div style="color:#6E6E82;font-size:12px;margin-top:4px">这里空空如也</div>
+      <div class="label" style="margin-top:10px">空状态</div>
+      <div style="color:#8A8A9E;font-size:11px;margin-top:4px">图标 + 主标题 + 副标题，<br>可选"立即创建"按钮</div>
+    </div>
+    <div style="flex:1;min-width:220px;background:#13131E;border-radius:8px;padding:14px;text-align:center">
+      <div style="width:100%;height:60px;background:linear-gradient(90deg,#1C1C2C 25%,#252545 50%,#1C1C2C 75%);border-radius:6px;margin-bottom:8px;animation:none"></div>
+      <div style="width:70%;height:12px;background:#1C1C2C;border-radius:3px;margin:4px auto"></div>
+      <div style="width:50%;height:10px;background:#1C1C2C;border-radius:3px;margin:4px auto"></div>
+      <div class="label" style="margin-top:10px">骨架屏（文章列表/详情）</div>
+      <div style="color:#8A8A9E;font-size:11px;margin-top:4px">#1C1C2C 闪烁动画<br>替代 el-loading 菊花</div>
+    </div>
+    <div style="flex:1;min-width:220px;background:#13131E;border-radius:8px;padding:14px;text-align:center">
+      <div style="background:#2A1010;border:1px solid #5C1010;border-radius:6px;padding:10px;margin-bottom:8px">
+        <div style="color:#F87171;font-size:12px">⚠ 加载失败，请刷新重试</div>
+      </div>
+      <div class="label" style="margin-top:10px">错误状态</div>
+      <div style="color:#8A8A9E;font-size:11px;margin-top:4px">红色提示框 + 重试按钮<br>替代静默失败</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>五、Polish 任务清单</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px">
+    <tr style="color:#6E6E82;border-bottom:1px solid #1C1C2C">
+      <th style="padding:8px 12px;text-align:left">区域</th>
+      <th style="padding:8px 12px;text-align:left">主要调整点</th>
+      <th style="padding:8px 12px;text-align:center">工作量</th>
+    </tr>
+    <tr style="border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">FrontLayout 导航栏</td>
+      <td style="padding:8px 12px;color:#8A8A9E">高度/间距/激活态/分割线</td>
+      <td style="padding:8px 12px;text-align:center">S</td>
+    </tr>
+    <tr style="background:#0D0D1A;border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">ArticleCard 组件</td>
+      <td style="padding:8px 12px;color:#8A8A9E">封面高度/内边距/字号/卡片圆角</td>
+      <td style="padding:8px 12px;text-align:center">S</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">PostListView 筛选栏</td>
+      <td style="padding:8px 12px;color:#8A8A9E">FilterBar (#13131E) + 激活按钮 (#E8A838) + 分页</td>
+      <td style="padding:8px 12px;text-align:center">M</td>
+    </tr>
+    <tr style="background:#0D0D1A;border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">PostDetailView</td>
+      <td style="padding:8px 12px;color:#8A8A9E">Hero覆盖图/代码块/引用块/点赞栏/邻篇卡片</td>
+      <td style="padding:8px 12px;text-align:center">L</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">AdminLayout 侧边栏</td>
+      <td style="padding:8px 12px;color:#8A8A9E">菜单项规格/激活态/用户栏/Logo 区</td>
+      <td style="padding:8px 12px;text-align:center">M</td>
+    </tr>
+    <tr style="background:#0D0D1A;border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">所有后台列表页</td>
+      <td style="padding:8px 12px;color:#8A8A9E">表头/交替行/工具栏/按钮颜色统一</td>
+      <td style="padding:8px 12px;text-align:center">M</td>
+    </tr>
+    <tr style="color:#F0F0F8">
+      <td style="padding:8px 12px">空/错误/骨架屏</td>
+      <td style="padding:8px 12px;color:#8A8A9E">提取公共组件，替换 el-loading 菊花</td>
+      <td style="padding:8px 12px;text-align:center">M</td>
+    </tr>
+  </table>
+  <div style="margin-top:8px;color:#6E6E82;font-size:12px">S = 1-2h · M = 半天 · L = 1天</div>
+</div>

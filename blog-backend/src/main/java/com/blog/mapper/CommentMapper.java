@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 评论数据访问层
@@ -36,4 +37,10 @@ public interface CommentMapper extends BaseMapper<Comment> {
      */
     @Select("SELECT COUNT(*) FROM comments WHERE status = #{status}")
     long countByStatus(@Param("status") String status);
+
+    @Select("SELECT DATE(created_at) AS date, COUNT(*) AS count " +
+            "FROM comments " +
+            "WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) " +
+            "GROUP BY DATE(created_at) ORDER BY date ASC")
+    List<Map<String, Object>> countByDayLast7();
 }

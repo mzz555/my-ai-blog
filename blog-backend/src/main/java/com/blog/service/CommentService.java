@@ -36,11 +36,12 @@ public interface CommentService extends IService<Comment> {
     /**
      * 分页查询所有评论（管理端）
      *
-     * @param page 页码，从 1 开始
-     * @param size 每页数量
+     * @param page   页码，从 1 开始
+     * @param size   每页数量
+     * @param status 状态过滤，null 时返回全部
      * @return 分页结果
      */
-    PageResult<CommentResponse> listAllForAdmin(int page, int size);
+    PageResult<CommentResponse> listAllForAdmin(int page, int size, String status);
 
     /**
      * 更新评论审核状态

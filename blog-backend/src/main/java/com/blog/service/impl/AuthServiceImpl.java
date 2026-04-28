@@ -116,6 +116,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
         User user = this.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, username));
         if (user == null) throw new NotFoundException("用户不存在");
         if (dto.getBio() != null) user.setBio(dto.getBio());
+        if (dto.getAvatar() != null) user.setAvatar(dto.getAvatar());
         this.updateById(user);
         return getCurrentUser(username);
     }

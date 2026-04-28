@@ -1,15 +1,20 @@
 package com.blog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.blog.dto.category.CategoryVO;
 import com.blog.entity.Category;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import java.util.List;
 
-/**
- * 文章分类数据访问层
- *
- * @author blog
- * @since 1.0.0
- */
 @Mapper
 public interface CategoryMapper extends BaseMapper<Category> {
+
+    @Select("SELECT c.id, c.name, c.slug, c.description, c.sort_order, " +
+            "COUNT(a.id) AS article_count " +
+            "FROM categories c " +
+            "LEFT JOIN articles a ON a.category_id = c.id " +
+            "GROUP BY c.id, c.name, c.slug, c.description, c.sort_order " +
+            "ORDER BY c.sort_order ASC")
+    List<CategoryVO> selectWithArticleCount();
 }

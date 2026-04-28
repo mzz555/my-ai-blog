@@ -2,12 +2,17 @@ package com.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.blog.common.exception.BusinessException;
 import com.blog.common.exception.NotFoundException;
 import com.blog.dto.category.CategoryRequest;
+import com.blog.dto.category.CategoryVO;
+import com.blog.entity.Article;
 import com.blog.entity.Category;
+import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.CategoryMapper;
 import com.blog.service.CategoryService;
 import com.github.slugify.Slugify;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -18,13 +23,15 @@ import java.util.List;
  * @since 1.0.0
  */
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
 
+    private final ArticleMapper articleMapper;
     private final Slugify slugify = Slugify.builder().build();
 
     @Override
-    public List<Category> listAll() {
-        return this.list(Wrappers.<Category>lambdaQuery().orderByAsc(Category::getSortOrder));
+    public List<CategoryVO> listAll() {
+        return this.baseMapper.selectWithArticleCount();
     }
 
     @Override
@@ -55,6 +62,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Override
     public void delete(Long id) {
+        long count = articleMapper.selectCount(
+                Wrappers.<Article>lambdaQuery().eq(Article::getCategoryId, id));
+        if (count > 0) {
+            throw new BusinessException(400, "该分类下还有 " + count + " 篇文章，请先移除文章后再删除");
+        }
         this.removeById(id);
     }
 

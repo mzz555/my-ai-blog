@@ -63,15 +63,18 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<CommentResponse> listAllForAdmin(int page, int size) {
-        Page<Comment> pageData = this.page(
-                new Page<>(page, size),
-                Wrappers.<Comment>lambdaQuery().orderByDesc(Comment::getCreatedAt)
-        );
-        fillUsers(pageData.getRecords());
-        List<CommentResponse> list = pageData.getRecords().stream()
-                .map(this::toResponse)
-                .toList();
+    public PageResult<CommentResponse> listAllForAdmin(int page, int size, String status) {
+        var wrapper = Wrappers.<Comment>lambdaQuery();
+        if (status != null && !status.isBlank()) {
+            wrapper.eq(Comment::getStatus, CommentStatus.valueOf(status));
+        }
+        wrapper.orderByDesc(Comment::getCreatedAt);
+        Page<Comment> pageData = this.page(new Page<>(page, size), wrapper);
+        List<Comment> records = pageData.getRecords();
+        fillUsers(records);
+        fillArticles(records);
+        fillParents(records);
+        List<CommentResponse> list = records.stream().map(this::toResponse).toList();
         return PageResult.of(list, pageData.getTotal(), page, size);
     }
 
@@ -107,6 +110,31 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         comments.forEach(c -> c.setUser(userMap.get(c.getUserId())));
     }
 
+    private void fillArticles(List<Comment> comments) {
+        List<Long> articleIds = comments.stream()
+                .map(Comment::getArticleId).filter(Objects::nonNull).distinct().toList();
+        if (articleIds.isEmpty()) return;
+        Map<Long, Article> articleMap = articleMapper.selectBatchIds(articleIds).stream()
+                .collect(Collectors.toMap(Article::getId, a -> a));
+        comments.forEach(c -> c.setArticle(articleMap.get(c.getArticleId())));
+    }
+
+    private void fillParents(List<Comment> comments) {
+        List<Long> parentIds = comments.stream()
+                .map(Comment::getParentId).filter(Objects::nonNull).distinct().toList();
+        if (parentIds.isEmpty()) return;
+        Map<Long, Comment> parentMap = this.listByIds(parentIds).stream()
+                .collect(Collectors.toMap(Comment::getId, p -> p));
+        fillUsers(new ArrayList<>(parentMap.values()));
+        comments.forEach(c -> {
+            if (c.getParentId() == null) return;
+            Comment parent = parentMap.get(c.getParentId());
+            if (parent == null) return;
+            String nick = parent.getUser() != null ? parent.getUser().getUsername() : parent.getNickname();
+            c.setParentNickname(nick);
+        });
+    }
+
     /**
      * 将评论列表构建为树形结构（楼中楼）
      *
@@ -129,14 +157,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         return roots;
     }
 
-    /**
-     * 将评论实体转换为响应 DTO
-     */
     private CommentResponse toResponse(Comment c) {
         CommentResponse r = new CommentResponse();
         r.setId(c.getId());
         r.setContent(c.getContent());
         r.setParentId(c.getParentId());
+        r.setParentNickname(c.getParentNickname());
         r.setStatus(c.getStatus().name());
         r.setCreatedAt(c.getCreatedAt());
         if (c.getUser() != null) {
@@ -144,6 +170,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             r.setAvatar(c.getUser().getAvatar());
         } else {
             r.setNickname(c.getNickname());
+        }
+        if (c.getArticle() != null) {
+            r.setArticleId(c.getArticleId());
+            r.setArticleTitle(c.getArticle().getTitle());
+            r.setArticleSlug(c.getArticle().getSlug());
         }
         return r;
     }

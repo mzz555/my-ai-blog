@@ -44,7 +44,7 @@
       </el-table-column>
     </el-table>
 
-    <div v-if="roles.length > pageSize" class="pagination-wrap">
+    <div class="pagination-wrap">
       <el-pagination
         background
         layout="total, prev, pager, next"
@@ -154,8 +154,7 @@ async function handleSave() {
     ElMessage.success('保存成功')
     dialogVisible.value = false
     loadRoles()
-  } catch (e) {
-    ElMessage.error(e?.response?.data?.message || '操作失败')
+  } catch {
   } finally {
     saving.value = false
   }
@@ -166,8 +165,7 @@ async function handleDelete(id) {
     await deleteRole(id)
     ElMessage.success('已删除')
     loadRoles()
-  } catch (e) {
-    ElMessage.error(e?.response?.data?.message || '删除失败')
+  } catch {
   }
 }
 

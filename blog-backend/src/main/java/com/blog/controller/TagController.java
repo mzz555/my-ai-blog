@@ -2,6 +2,7 @@ package com.blog.controller;
 
 import com.blog.common.Result;
 import com.blog.dto.tag.TagRequest;
+import com.blog.dto.tag.TagVO;
 import com.blog.entity.Tag;
 import com.blog.service.TagService;
 import jakarta.validation.Valid;
@@ -18,7 +19,7 @@ public class TagController {
     private final TagService tagService;
 
     @GetMapping
-    public Result<List<Tag>> list() {
+    public Result<List<TagVO>> list() {
         return Result.success(tagService.listAll());
     }
 

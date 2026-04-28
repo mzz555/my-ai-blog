@@ -2,6 +2,7 @@ package com.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.blog.dto.category.CategoryRequest;
+import com.blog.dto.category.CategoryVO;
 import com.blog.entity.Category;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface CategoryService extends IService<Category> {
      *
      * @return 分类列表
      */
-    List<Category> listAll();
+    List<CategoryVO> listAll();
 
     /**
      * 创建新分类

@@ -1,6 +1,7 @@
 package com.blog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.blog.dto.tag.TagVO;
 import com.blog.entity.Tag;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -38,4 +39,11 @@ public interface TagMapper extends BaseMapper<Tag> {
             "JOIN article_tags at ON t.id = at.tag_id " +
             "WHERE at.article_id = #{articleId}")
     List<Tag> selectByArticleId(@Param("articleId") Long articleId);
+
+    @Select("SELECT t.id, t.name, t.slug, COUNT(at.article_id) AS article_count " +
+            "FROM tags t " +
+            "LEFT JOIN article_tags at ON t.id = at.tag_id " +
+            "GROUP BY t.id, t.name, t.slug " +
+            "ORDER BY t.name ASC")
+    List<TagVO> selectWithArticleCount();
 }

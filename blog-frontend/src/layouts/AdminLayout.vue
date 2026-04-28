@@ -26,10 +26,20 @@
         </div>
 
         <div class="header-right">
+          <router-link to="/" target="_blank" class="front-link">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            前台
+          </router-link>
           <ThemeToggle />
           <el-dropdown trigger="click" placement="bottom-end">
             <div class="user-trigger">
-              <div class="user-avatar">{{ userInitial }}</div>
+              <div class="user-avatar">
+                <img v-if="userStore.userInfo?.avatar" :src="userStore.userInfo.avatar" class="avatar-img" alt="头像" />
+                <span v-else>{{ userInitial }}</span>
+              </div>
               <span class="username">{{ userStore.userInfo?.username }}</span>
               <el-icon :size="12" class="chevron"><ArrowDown /></el-icon>
             </div>
@@ -96,6 +106,7 @@ function handleLogout() {
   height: 100vh;
   background: var(--color-bg-tertiary);
   overflow: hidden;
+  transition: background var(--transition-base);
 }
 
 .sidebar {
@@ -123,6 +134,7 @@ function handleLogout() {
   justify-content: space-between;
   padding: 0 var(--space-5);
   flex-shrink: 0;
+  transition: background var(--transition-base), border-color var(--transition-base);
 }
 
 .header-left {
@@ -181,6 +193,26 @@ function handleLogout() {
   gap: var(--space-3);
 }
 
+.front-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.front-link:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent-border);
+  background: var(--color-accent-light);
+}
+
 .user-trigger {
   display: flex;
   align-items: center;
@@ -206,6 +238,14 @@ function handleLogout() {
   flex-shrink: 0;
 }
 
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
 .username {
   font-size: 13px;
   font-weight: 500;
@@ -223,6 +263,7 @@ function handleLogout() {
   overflow-y: auto;
   padding: var(--space-6);
   background: var(--color-bg-tertiary);
+  transition: background var(--transition-base);
 }
 
 /* 页面过渡动画 */

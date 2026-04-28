@@ -11,6 +11,8 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -61,6 +63,38 @@ public class StatsServiceImpl implements StatsService {
                 redisTemplate.delete(key);
             }
         }
+    }
+
+    @Override
+    public Map<String, Object> getTrend() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter displayFmt = DateTimeFormatter.ofPattern("MM-dd");
+        DateTimeFormatter dbFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<String> dates = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) dates.add(today.minusDays(i).format(displayFmt));
+
+        Map<String, Integer> commentMap = new HashMap<>();
+        commentMapper.countByDayLast7().forEach(m ->
+                commentMap.put(m.get("date").toString(), ((Number) m.get("count")).intValue()));
+
+        Map<String, Integer> articleMap = new HashMap<>();
+        articleMapper.countPublishedByDayLast7().forEach(m ->
+                articleMap.put(m.get("date").toString(), ((Number) m.get("count")).intValue()));
+
+        List<Integer> comments = new ArrayList<>();
+        List<Integer> articles = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            String key = today.minusDays(i).format(dbFmt);
+            comments.add(commentMap.getOrDefault(key, 0));
+            articles.add(articleMap.getOrDefault(key, 0));
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("dates", dates);
+        result.put("comments", comments);
+        result.put("articles", articles);
+        return result;
     }
 
     @Override

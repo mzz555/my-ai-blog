@@ -11,7 +11,11 @@ public class CommentResponse {
     private String nickname;
     private String avatar;
     private Long parentId;
+    private String parentNickname;
     private String status;
     private LocalDateTime createdAt;
+    private Long articleId;
+    private String articleTitle;
+    private String articleSlug;
     private List<CommentResponse> children;
 }

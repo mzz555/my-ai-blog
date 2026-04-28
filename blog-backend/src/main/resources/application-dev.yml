@@ -17,6 +17,9 @@ minio:
   secret-key: ${MINIO_SECRET_KEY:minioadmin}
   bucket: ${MINIO_BUCKET:blog}
 
+upload:
+  dir: ${UPLOAD_DIR:uploads}
+
 logging:
   level:
     com.blog: DEBUG

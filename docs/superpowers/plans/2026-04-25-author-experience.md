@@ -103,7 +103,7 @@ const plain = md
   .replace(/!?\[.*?\]\(.*?\)/g, '')
   .replace(/#{1,6}\s/g, '')
   .replace(/[*_~>]/g, '')
-console.log('zh:', (plain.match(/[一-龥]/g) || []).length)  // 期望 12
+console.log('zh:', (plain.match(/[一-龥]/g) || []).length)  // 期望 14
 console.log('en:', (plain.match(/\b[a-zA-Z]+\b/g) || []).length)    // 期望 2
 ```
 

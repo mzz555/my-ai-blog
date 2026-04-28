@@ -3,9 +3,9 @@
     <div class="page-head">
       <h2 class="page-title">{{ isEdit ? '编辑文章' : '写新文章' }}</h2>
     </div>
-    <el-form :model="form" label-width="80px" class="edit-form">
-      <el-form-item label="标题">
-        <el-input v-model="form.title" placeholder="文章标题" size="large" />
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="80px" class="edit-form">
+      <el-form-item label="标题" prop="title" required>
+        <el-input v-model="form.title" placeholder="文章标题（必填）" size="large" />
       </el-form-item>
       <el-row :gutter="12">
         <el-col :span="8">
@@ -35,22 +35,21 @@
       <el-form-item label="封面图">
         <div style="display:flex;align-items:center;gap:12px">
           <img v-if="form.coverImage" :src="form.coverImage"
-            style="width:120px;height:67px;object-fit:cover;border-radius:4px;border:1px solid #2A2A3C" />
-          <el-upload :before-upload="handleCoverUpload" :show-file-list="false" accept="image/*">
-            <el-button size="small">{{ form.coverImage ? '更换封面' : '上传封面' }}</el-button>
-          </el-upload>
+            style="width:120px;height:67px;object-fit:cover;border-radius:4px;border:1px solid var(--color-border)" />
+          <el-button size="small" :loading="coverUploading" @click="coverInput.click()">
+            {{ form.coverImage ? '更换封面' : '上传封面' }}
+          </el-button>
           <el-button v-if="form.coverImage" size="small" @click="form.coverImage = ''">移除</el-button>
+          <input ref="coverInput" type="file" accept="image/*" style="display:none" @change="handleCoverChange" />
         </div>
       </el-form-item>
-
-      <CoverCropDialog v-model:visible="cropDialogVisible" :file="cropFile" @done="onCropDone" />
       <el-form-item label="Slug">
         <el-input v-model="form.slug" placeholder="URL 路径（自动生成，可手动修改）" />
       </el-form-item>
       <el-form-item label="摘要">
         <el-input v-model="form.summary" type="textarea" :rows="2" placeholder="文章摘要（SEO）" />
       </el-form-item>
-      <el-form-item label="内容">
+      <el-form-item label="内容" prop="content" required>
         <MdEditor v-model="form.content" :theme="editorTheme" style="width:100%" @onUploadImg="handleUpload" />
       </el-form-item>
       <div v-if="wordCount > 0" class="word-count-bar">
@@ -69,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { MdEditor } from 'md-editor-v3'
@@ -81,18 +80,23 @@ import { uploadImage } from '@/api/upload'
 import { ElMessage } from 'element-plus'
 import { useArticleDraft, clearDraft } from '@/composables/useArticleDraft'
 import { useWordCount } from '@/composables/useWordCount'
-import CoverCropDialog from '@/components/admin/CoverCropDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
 const isEdit = computed(() => !!route.params.id)
 const editorTheme = computed(() => appStore.darkMode ? 'dark' : 'light')
+const formRef = ref(null)
 const saving = ref(false)
+const coverUploading = ref(false)
+const coverInput = ref(null)
 const categories = ref([])
 const tags = ref([])
-const cropDialogVisible = ref(false)
-const cropFile = ref(null)
+
+const rules = {
+  title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
+  content: [{ required: true, message: '内容不能为空', trigger: 'blur' }],
+}
 
 const form = reactive({
   title: '', slug: '', summary: '', content: '', coverImage: '',
@@ -121,19 +125,24 @@ async function handleUpload(files, callback) {
   callback(results)
 }
 
-function handleCoverUpload(file) {
-  cropFile.value = file.raw || file
-  cropDialogVisible.value = true
-  return false
-}
-
-function onCropDone(url) {
-  form.coverImage = url
+async function handleCoverChange(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  coverUploading.value = true
+  try {
+    const res = await uploadImage(file)
+    form.coverImage = res.data
+  } catch {
+    ElMessage.error('封面上传失败，请重试')
+  } finally {
+    coverUploading.value = false
+    e.target.value = ''
+  }
 }
 
 async function handleSave() {
-  if (!form.title) return ElMessage.warning('请输入标题')
-  if (!form.content) return ElMessage.warning('请输入内容')
+  const valid = await formRef.value?.validate().catch(() => false)
+  if (!valid) return
   saving.value = true
   try {
     if (isEdit.value) {
@@ -146,8 +155,8 @@ async function handleSave() {
       ElMessage.success('发布成功')
       router.push('/admin/articles')
     }
-  } catch (e) {
-    ElMessage.error(e?.response?.data?.message || '保存失败，请重试')
+  } catch {
+    // request.js 全局拦截已弹窗，此处只需还原状态
   } finally {
     saving.value = false
   }
@@ -175,7 +184,6 @@ onMounted(async () => {
         allowComment: a.allowComment !== false,
       })
     } catch {
-      ElMessage.error('加载文章失败')
     }
   }
 })

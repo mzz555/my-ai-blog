@@ -173,7 +173,7 @@ watch(
 
 :deep(.hl) {
   background: rgba(232,168,56,.25);
-  color: var(--color-primary);
+  color: var(--color-accent);
   border-radius: 2px;
   padding: 0 1px;
   font-style: normal;

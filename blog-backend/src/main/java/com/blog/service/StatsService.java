@@ -6,4 +6,5 @@ public interface StatsService {
     void incrementViewCount(Long articleId);
     void syncViewCountsToDb();
     Map<String, Object> getOverview();
+    Map<String, Object> getTrend();
 }

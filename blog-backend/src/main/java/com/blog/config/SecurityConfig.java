@@ -35,6 +35,7 @@ public class SecurityConfig {
                                  "/api/tags", "/api/articles/*/comments",
                                  "/sitemap.xml", "/robots.txt").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/articles/*/comments").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
             )

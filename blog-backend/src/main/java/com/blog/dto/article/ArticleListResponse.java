@@ -14,6 +14,7 @@ public class ArticleListResponse {
     private Integer viewCount;
     private Boolean isTop;
     private LocalDateTime publishedAt;
+    private Long categoryId;
     private String categoryName;
     private List<String> tagNames;
     private String authorName;

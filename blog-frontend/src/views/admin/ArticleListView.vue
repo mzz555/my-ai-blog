@@ -24,16 +24,32 @@
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
 
-      <el-select v-model="statusFilter" placeholder="全部状态" clearable class="filter-select" @change="search">
+      <el-select v-model="categoryFilter" placeholder="全部分类" clearable class="filter-select" @change="search">
+        <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id" />
+      </el-select>
+
+      <el-select v-model="tagFilter" placeholder="全部标签" clearable class="filter-select" @change="search">
+        <el-option v-for="t in tags" :key="t.id" :label="t.name" :value="t.id" />
+      </el-select>
+
+      <el-select v-model="statusFilter" placeholder="全部状态" clearable class="filter-select-sm" @change="search">
         <el-option label="已发布" value="PUBLISHED" />
         <el-option label="草稿" value="DRAFT" />
       </el-select>
 
       <el-button @click="search">搜索</el-button>
+      <el-button v-if="hasFilter" @click="resetFilter">重置</el-button>
     </div>
 
     <!-- 表格 -->
     <el-table :data="articles" v-loading="loading" class="article-table">
+      <!-- 序号 -->
+      <el-table-column label="#" width="56" align="center">
+        <template #default="{ $index }">
+          <span class="seq-num">{{ (page - 1) * pageSize + $index + 1 }}</span>
+        </template>
+      </el-table-column>
+
       <!-- 封面 -->
       <el-table-column label="封面" width="88">
         <template #default="{ row }">
@@ -44,24 +60,46 @@
         </template>
       </el-table-column>
 
-      <!-- 标题 + 摘要 -->
-      <el-table-column label="文章" min-width="280">
+      <!-- 文章标题 + 摘要 -->
+      <el-table-column label="文章" min-width="240">
         <template #default="{ row }">
           <div class="title-block">
             <router-link :to="`/admin/articles/${row.id}/edit`" class="title-link">
               {{ row.title }}
             </router-link>
             <p v-if="row.summary" class="summary-text">{{ row.summary }}</p>
-            <div class="meta-row">
-              <span v-if="row.categoryName" class="cat-chip">{{ row.categoryName }}</span>
-              <span v-for="tag in (row.tagNames || []).slice(0,2)" :key="tag" class="tag-chip">#{{ tag }}</span>
-            </div>
+          </div>
+        </template>
+      </el-table-column>
+
+      <!-- 分类 -->
+      <el-table-column label="分类" width="110">
+        <template #default="{ row }">
+          <span
+            v-if="row.categoryName"
+            class="cat-chip cat-chip--link"
+            @click="jumpFilter('category', row.categoryId)"
+          >{{ row.categoryName }}</span>
+          <span v-else class="none-text">—</span>
+        </template>
+      </el-table-column>
+
+      <!-- 标签 -->
+      <el-table-column label="标签" min-width="130">
+        <template #default="{ row }">
+          <div class="tag-wrap">
+            <span
+              v-for="tag in (row.tagNames || []).slice(0, 3)"
+              :key="tag"
+              class="tag-chip"
+            >#{{ tag }}</span>
+            <span v-if="(row.tagNames || []).length > 3" class="tag-more">+{{ row.tagNames.length - 3 }}</span>
           </div>
         </template>
       </el-table-column>
 
       <!-- 状态 -->
-      <el-table-column label="状态" width="90" align="center">
+      <el-table-column label="状态" width="86" align="center">
         <template #default="{ row }">
           <span :class="['status-dot', row.status === 'PUBLISHED' ? 'status-dot--pub' : 'status-dot--draft']">
             {{ row.status === 'PUBLISHED' ? '已发布' : '草稿' }}
@@ -70,21 +108,21 @@
       </el-table-column>
 
       <!-- 阅读量 -->
-      <el-table-column prop="viewCount" label="阅读" width="70" align="center">
+      <el-table-column prop="viewCount" label="阅读" width="66" align="center">
         <template #default="{ row }">
           <span class="num-text">{{ row.viewCount ?? 0 }}</span>
         </template>
       </el-table-column>
 
       <!-- 发布时间 -->
-      <el-table-column label="发布时间" width="112">
+      <el-table-column label="发布时间" width="108">
         <template #default="{ row }">
           <span class="date-text">{{ row.publishedAt ? formatDate(row.publishedAt) : '—' }}</span>
         </template>
       </el-table-column>
 
       <!-- 操作 -->
-      <el-table-column label="操作" width="150" fixed="right">
+      <el-table-column label="操作" width="140" fixed="right">
         <template #default="{ row }">
           <div class="act-group">
             <button class="act-btn act-btn--edit" @click="$router.push(`/admin/articles/${row.id}/edit`)">
@@ -136,11 +174,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { getAdminArticles, deleteArticle } from '@/api/article'
+import { getCategories } from '@/api/category'
+import { getTags } from '@/api/tag'
 import { formatDate } from '@/utils/format'
 import { ElMessage } from 'element-plus'
 import { Plus, Search, Edit, Delete, Picture, Warning } from '@element-plus/icons-vue'
+
+const route = useRoute()
+const router = useRouter()
 
 const articles = ref([])
 const loading = ref(false)
@@ -148,11 +192,19 @@ const page = ref(1)
 const pageSize = 10
 const total = ref(0)
 const keyword = ref('')
+const categoryFilter = ref(null)
+const tagFilter = ref(null)
 const statusFilter = ref('')
+const categories = ref([])
+const tags = ref([])
 
 const deleteDialogVisible = ref(false)
 const deleteTarget = ref(null)
 const deleting = ref(false)
+
+const hasFilter = computed(() =>
+  keyword.value || categoryFilter.value || tagFilter.value || statusFilter.value
+)
 
 async function loadArticles(p = 1) {
   loading.value = true
@@ -161,6 +213,8 @@ async function loadArticles(p = 1) {
     const params = { page: p, size: pageSize }
     if (keyword.value.trim()) params.keyword = keyword.value.trim()
     if (statusFilter.value) params.status = statusFilter.value
+    if (categoryFilter.value) params.categoryId = categoryFilter.value
+    if (tagFilter.value) params.tagId = tagFilter.value
     const res = await getAdminArticles(params)
     articles.value = res.data.list
     total.value = res.data.total
@@ -170,6 +224,23 @@ async function loadArticles(p = 1) {
 }
 
 function search() { loadArticles(1) }
+
+function resetFilter() {
+  keyword.value = ''
+  categoryFilter.value = null
+  tagFilter.value = null
+  statusFilter.value = ''
+  router.replace({ query: {} })
+  loadArticles(1)
+}
+
+function jumpFilter(type, id) {
+  if (type === 'category') {
+    categoryFilter.value = id
+    tagFilter.value = null
+  }
+  loadArticles(1)
+}
 
 function openDelete(row) {
   deleteTarget.value = row
@@ -184,14 +255,22 @@ async function confirmDelete() {
     ElMessage.success('文章已删除')
     deleteDialogVisible.value = false
     loadArticles(page.value)
-  } catch {
-    ElMessage.error('删除失败，请重试')
   } finally {
     deleting.value = false
   }
 }
 
-onMounted(() => loadArticles())
+onMounted(async () => {
+  const [catRes, tagRes] = await Promise.all([getCategories(), getTags()])
+  categories.value = catRes.data
+  tags.value = tagRes.data
+
+  // 支持从分类/标签管理页跳转带参数
+  if (route.query.categoryId) categoryFilter.value = Number(route.query.categoryId)
+  if (route.query.tagId) tagFilter.value = Number(route.query.tagId)
+
+  loadArticles(1)
+})
 </script>
 
 <style scoped>
@@ -224,11 +303,16 @@ onMounted(() => loadArticles())
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
 }
-.filter-input { max-width: 280px; }
+.filter-input { max-width: 240px; }
 .filter-select { width: 130px; }
+.filter-select-sm { width: 110px; }
 
 .article-table { border-radius: var(--radius-lg); overflow: hidden; }
+
+/* 序号 */
+.seq-num { font-size: 12px; color: var(--color-text-tertiary); font-variant-numeric: tabular-nums; }
 
 /* 封面 */
 .cover-cell { width: 64px; height: 42px; }
@@ -237,18 +321,18 @@ onMounted(() => loadArticles())
   height: 42px;
   object-fit: cover;
   border-radius: 4px;
-  border: 1px solid #1C1C2C;
+  border: 1px solid var(--color-border);
   display: block;
 }
 .cover-placeholder {
   width: 64px;
   height: 42px;
   border-radius: 4px;
-  background: #1C1C2E;
+  background: var(--color-bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3A3A5C;
+  color: var(--color-text-tertiary);
   font-size: 18px;
 }
 
@@ -277,18 +361,35 @@ onMounted(() => loadArticles())
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.meta-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+/* 分类 */
 .cat-chip {
+  display: inline-block;
   font-size: 11px;
-  padding: 1px 7px;
-  border-radius: 3px;
-  background: #1C1C2E;
-  color: #9CA3AF;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.tag-chip {
-  font-size: 11px;
-  color: #4A4A6A;
+.cat-chip--link {
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
 }
+.cat-chip--link:hover {
+  color: #E8A838;
+  border-color: rgba(232,168,56,.4);
+}
+.none-text { font-size: 12px; color: var(--color-text-tertiary); }
+
+/* 标签 */
+.tag-wrap { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.tag-chip { font-size: 11px; color: var(--color-text-tertiary); }
+.tag-more { font-size: 11px; color: var(--color-text-tertiary); }
 
 /* 状态 */
 .status-dot {
@@ -299,8 +400,8 @@ onMounted(() => loadArticles())
   padding: 3px 8px;
   border-radius: 20px;
 }
-.status-dot--pub { background: #1A2010; color: #6FCF97; }
-.status-dot--draft { background: #1A1028; color: #9CA3AF; }
+.status-dot--pub   { background: rgba(34,197,94,.12);  color: #22C55E; border: 1px solid rgba(34,197,94,.25); }
+.status-dot--draft { background: rgba(107,114,128,.1); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
 
 .num-text { font-size: 13px; color: var(--color-text-secondary); }
 .date-text { font-size: 12px; color: var(--color-text-tertiary); }
@@ -346,7 +447,7 @@ onMounted(() => loadArticles())
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: #2D1A1A;
+  background: rgba(239,68,68,.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -367,7 +468,6 @@ onMounted(() => loadArticles())
 .delete-hint { margin: 0; font-size: 12px; color: var(--color-text-tertiary); }
 .delete-footer { display: flex; justify-content: flex-end; gap: 10px; }
 
-/* El-Plus 覆盖：依赖全局 tokens.css，此处只补充布局相关 */
 :deep(.el-table__row) { height: 68px; }
 :deep(.el-dialog__header) { padding: 16px 20px; }
 :deep(.el-dialog__body) { padding: 20px; }

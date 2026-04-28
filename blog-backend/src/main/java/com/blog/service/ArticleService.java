@@ -72,7 +72,7 @@ public interface ArticleService extends IService<Article> {
      * @param size 每页数量
      * @return 分页结果
      */
-    PageResult<ArticleListResponse> listAll(int page, int size, String keyword, String status);
+    PageResult<ArticleListResponse> listAll(int page, int size, String keyword, String status, Long categoryId, Long tagId);
 
     PageResult<ArticleListResponse> search(String keyword, int page, int size);
 

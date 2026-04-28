@@ -33,26 +33,40 @@ defineProps({ article: Object })
 </script>
 
 <style scoped>
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .article-card {
-  background: #13131E;
-  border: 1px solid #1C1C2C;
-  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.2s, transform var(--transition-base);
+  transition: border-color var(--transition-base), transform var(--transition-base),
+              box-shadow var(--transition-base);
+  animation: fadeInUp 0.42s ease both;
 }
 .article-card:hover {
-  border-color: rgba(232, 168, 56, 0.4);
-  transform: translateY(-2px);
+  border-color: rgba(232, 168, 56, 0.45);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Light mode accent top border on hover */
+:root:not([data-theme='dark']) .article-card:hover {
+  box-shadow: 0 8px 32px rgba(232,168,56,0.12), 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .cover {
   width: 100%;
-  height: 140px;
+  height: 148px;
   overflow: hidden;
-  background: #1C1C2E;
+  background: var(--color-bg-secondary);
+  flex-shrink: 0;
 }
 .cover img {
   width: 100%;
@@ -60,13 +74,14 @@ defineProps({ article: Object })
   object-fit: cover;
   transition: transform var(--transition-slow);
 }
-.article-card:hover .cover img { transform: scale(1.04); }
+.article-card:hover .cover img { transform: scale(1.05); }
 
 .body {
-  padding: 20px 20px 16px 20px;
+  padding: 20px 20px 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
 }
 
 .meta-top { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -75,53 +90,69 @@ defineProps({ article: Object })
   font-size: 11px;
   font-weight: 600;
   padding: 2px 8px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
-.badge-top { background: #1C1C2E; color: #E8A838; }
-.badge-cat { background: #1C1C2E; color: #8A8A9E; }
+.badge-top {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent-border);
+}
+.badge-cat {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-tertiary);
+  border: 1px solid var(--color-border);
+}
 
 .title {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #F0F0F8;
-  line-height: 1.4;
+  color: var(--color-text-primary);
+  line-height: 1.45;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   transition: color var(--transition-fast);
 }
-.article-card:hover .title { color: #E8A838; }
+.article-card:hover .title { color: var(--color-accent); }
 
 .summary {
   margin: 0;
   font-size: 13px;
-  color: #8A8A9E;
-  line-height: 1.6;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  flex: 1;
 }
 
-.meta-bottom { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.meta-bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
 
 .meta-item {
   display: flex;
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #6E6E82;
+  color: var(--color-text-tertiary);
 }
 
 .meta-icon { width: 12px; height: 12px; }
 
 .tag-link {
   font-size: 11px;
-  color: #6E6E82;
+  color: var(--color-text-tertiary);
   cursor: pointer;
   transition: color var(--transition-fast);
+  padding: 1px 0;
 }
-.tag-link:hover { color: #E8A838; }
+.tag-link:hover { color: var(--color-accent); }
 </style>

@@ -113,10 +113,11 @@ function doSearch() {
   top: 0;
   z-index: 100;
   height: 72px;
-  background: #0C0C10;
-  border-bottom: 1px solid #1C1C2C;
+  background: var(--color-header-bg);
+  border-bottom: 1px solid var(--color-header-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  transition: background var(--transition-base), border-color var(--transition-base);
 }
 
 .header-inner {
@@ -150,7 +151,7 @@ function doSearch() {
 }
 
 .nav-link {
-  color: #9CA3AF;
+  color: var(--color-text-secondary);
   text-decoration: none;
   font-size: 14px;
   font-weight: normal;
@@ -162,8 +163,7 @@ function doSearch() {
   color: #E8A838;
   background: var(--color-accent-light);
 }
-.nav-link.router-link-exact-active,
-.nav-link.router-link-active {
+.nav-link.router-link-exact-active {
   color: #E8A838;
   font-weight: 600;
 }

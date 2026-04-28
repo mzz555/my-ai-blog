@@ -1,0 +1,146 @@
+<h2>Important 阶段设计</h2>
+<p class="subtitle">5 个功能补全任务——后端接口 + 前端联调，每项独立可测</p>
+
+<div class="section">
+  <h3>① 文章编辑（最高优先，当前编辑模式完全损坏）</h3>
+  <div style="background:#22103C;border-left:3px solid #BB86FC;padding:12px 16px;border-radius:0 6px 6px 0;font-size:13px;color:#F0F0F8;margin-bottom:12px">
+    <strong>Bug：</strong>点击"编辑"进入 <code>/admin/articles/:id/edit</code> 时，<code>onMounted</code> 只加载分类/标签，
+    从不调用 API 获取文章数据，表单永远是空的。
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">后端：新增 GET /api/articles/admin/{id}</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:13px;line-height:2;padding-left:16px">
+        <li>返回完整文章字段（含 tagNames、categoryId、status、isTop、allowComment、coverImage）</li>
+        <li>需要 <code>article:write</code> 权限</li>
+        <li>ArticleController 已有 <code>@GetMapping("/{slug}")</code>，新增一个 <code>@GetMapping("/admin/{id}")</code></li>
+      </ul>
+    </div>
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">前端：ArticleEditView 补全</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:13px;line-height:2;padding-left:16px">
+        <li>新增 <code>getArticleById(id)</code> 到 api/article.js</li>
+        <li><code>onMounted</code> 中 isEdit 时调用，填充 form 所有字段</li>
+        <li>新增封面图上传 UI（调用已有 uploadImage）</li>
+        <li>slug 从标题自动生成（拼音/英文），可手动覆盖</li>
+        <li>按 Pencil Article Edit — Admin 样式重构布局</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>② 文章邻篇导航（上一篇 / 下一篇）</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">后端：GET /api/articles/{slug}/neighbors</div>
+      <div style="margin-top:8px;color:#F0F0F8;font-size:13px;line-height:1.8;font-family:monospace">
+        <div style="color:#6E6E82">// 响应结构</div>
+        <div>{ prev: {title, slug} | null,</div>
+        <div>&nbsp;&nbsp;next: {title, slug} | null }</div>
+        <br>
+        <div style="color:#6E6E82">// 查询逻辑</div>
+        <div style="color:#8A8A9E">prev = 同为 PUBLISHED，id &lt; 当前，DESC limit 1</div>
+        <div style="color:#8A8A9E">next = 同为 PUBLISHED，id &gt; 当前，ASC limit 1</div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">前端：PostDetailView 邻篇区域</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:13px;line-height:2;padding-left:16px">
+        <li>API 函数 <code>getArticleNeighbors(slug)</code> 已存在，直接调用</li>
+        <li>在文章内容底部渲染上/下篇卡片</li>
+        <li>按 Pencil Article Detail — Dark 设计，使用 #13131E 卡片</li>
+        <li>任一方向为 null 时隐藏对应卡片</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>③ 个人资料保存</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">后端：PATCH /api/users/profile</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:13px;line-height:2;padding-left:16px">
+        <li>从 JWT 获取当前用户 ID</li>
+        <li>允许更新字段：<code>bio</code>（昵称已从 UserController 覆盖）</li>
+        <li>返回更新后的用户对象</li>
+        <li>在 AuthController 中添加（复用 JWT 工具）</li>
+      </ul>
+    </div>
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">前端：ProfileView 启用保存</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:13px;line-height:2;padding-left:16px">
+        <li>新增 <code>updateProfile(data)</code> 到 api/auth.js</li>
+        <li>保存按钮调用，成功后刷新 Pinia userStore</li>
+        <li>去掉 disabled，加 loading 状态</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>④ 标签编辑 + ⑤ 用户编辑（两个小型补全）</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">标签编辑：PUT /api/tags/{id}</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:13px;line-height:2;padding-left:16px">
+        <li>TagController 新增一个 <code>@PutMapping("/{id}")</code></li>
+        <li>TagService 调用 <code>updateById</code>（MyBatis-Plus 已有）</li>
+        <li>TagManageView 前端逻辑已完整，无需修改</li>
+      </ul>
+    </div>
+    <div style="flex:1;min-width:280px;background:#13131E;border-radius:8px;padding:14px">
+      <div class="label">用户编辑：PUT /api/admin/users/{id}</div>
+      <ul style="margin-top:8px;color:#F0F0F8;font-size:13px;line-height:2;padding-left:16px">
+        <li>UserController 新增 <code>@PutMapping("/{id}")</code></li>
+        <li>请求体：<code>{ nickname, roleIds: Long[] }</code></li>
+        <li>Service 层：更新 nickname + 重新分配 user_roles（先删后插）</li>
+        <li>响应需包含 roles 数组（UserManageView 用于回显）</li>
+        <li>前端无需修改</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Important 阶段任务汇总</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px">
+    <tr style="color:#6E6E82;border-bottom:1px solid #1C1C2C">
+      <th style="padding:8px 12px;text-align:left">任务</th>
+      <th style="padding:8px 12px;text-align:center">后端改动</th>
+      <th style="padding:8px 12px;text-align:center">前端改动</th>
+      <th style="padding:8px 12px;text-align:center">难度</th>
+    </tr>
+    <tr style="border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">文章编辑补全（加载数据 + 封面 + slug）</td>
+      <td style="padding:8px 12px;text-align:center;color:#E8A838">新增端点</td>
+      <td style="padding:8px 12px;text-align:center;color:#E8A838">较多</td>
+      <td style="padding:8px 12px;text-align:center">⭐⭐</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">文章邻篇导航</td>
+      <td style="padding:8px 12px;text-align:center;color:#E8A838">新增端点</td>
+      <td style="padding:8px 12px;text-align:center;color:#6FCF97">少量</td>
+      <td style="padding:8px 12px;text-align:center">⭐</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">个人资料保存</td>
+      <td style="padding:8px 12px;text-align:center;color:#E8A838">新增端点</td>
+      <td style="padding:8px 12px;text-align:center;color:#6FCF97">少量</td>
+      <td style="padding:8px 12px;text-align:center">⭐</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1C1C2C;color:#F0F0F8">
+      <td style="padding:8px 12px">标签编辑（PUT /tags/{id}）</td>
+      <td style="padding:8px 12px;text-align:center;color:#6FCF97">1 行</td>
+      <td style="padding:8px 12px;text-align:center;color:#56CFE1">无需</td>
+      <td style="padding:8px 12px;text-align:center">⭐</td>
+    </tr>
+    <tr style="color:#F0F0F8">
+      <td style="padding:8px 12px">用户编辑 + 角色分配</td>
+      <td style="padding:8px 12px;text-align:center;color:#E8A838">新增端点</td>
+      <td style="padding:8px 12px;text-align:center;color:#56CFE1">无需</td>
+      <td style="padding:8px 12px;text-align:center">⭐</td>
+    </tr>
+  </table>
+</div>

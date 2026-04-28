@@ -2,6 +2,7 @@ package com.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.blog.dto.tag.TagRequest;
+import com.blog.dto.tag.TagVO;
 import com.blog.entity.Tag;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface TagService extends IService<Tag> {
      *
      * @return 标签列表
      */
-    List<Tag> listAll();
+    List<TagVO> listAll();
 
     /**
      * 创建新标签（slug 自动从名称生成）

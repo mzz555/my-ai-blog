@@ -2,6 +2,7 @@ package com.blog.controller;
 
 import com.blog.common.Result;
 import com.blog.dto.category.CategoryRequest;
+import com.blog.dto.category.CategoryVO;
 import com.blog.entity.Category;
 import com.blog.service.CategoryService;
 import jakarta.validation.Valid;
@@ -31,7 +32,7 @@ public class CategoryController {
      * @return 分类列表，按 sortOrder 升序
      */
     @GetMapping
-    public Result<List<Category>> list() {
+    public Result<List<CategoryVO>> list() {
         return Result.success(categoryService.listAll());
     }
 

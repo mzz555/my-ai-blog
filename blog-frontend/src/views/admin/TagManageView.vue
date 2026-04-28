@@ -21,7 +21,12 @@
         <div class="tag-card-inner">
           <span class="tag-hash">#</span>
           <span class="tag-name">{{ tag.name }}</span>
-          <span v-if="tag.articleCount != null" class="tag-count">{{ tag.articleCount }}</span>
+          <span
+            v-if="tag.articleCount != null"
+            class="tag-count"
+            :class="{ 'tag-count--link': tag.articleCount > 0 }"
+            @click="tag.articleCount > 0 && router.push(`/admin/articles?tagId=${tag.id}`)"
+          >{{ tag.articleCount }}篇</span>
         </div>
         <div class="tag-actions">
           <button class="tag-btn" @click="openDialog(tag)">
@@ -59,9 +64,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { getTags, createTag, updateTag, deleteTag } from '@/api/tag'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
+
+const router = useRouter()
 
 const tags = ref([])
 const loading = ref(false)
@@ -95,15 +103,19 @@ async function handleSave() {
     ElMessage.success('保存成功')
     dialogVisible.value = false
     load()
+  } catch {
   } finally {
     saving.value = false
   }
 }
 
 async function handleDelete(id) {
-  await deleteTag(id)
-  ElMessage.success('已删除')
-  load()
+  try {
+    await deleteTag(id)
+    ElMessage.success('已删除')
+    load()
+  } catch {
+  }
 }
 
 onMounted(load)
@@ -173,6 +185,14 @@ onMounted(load)
   border-radius: var(--radius-full);
   padding: 1px 6px;
   margin-left: 4px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tag-count--link {
+  cursor: pointer;
+}
+.tag-count--link:hover {
+  color: #E8A838;
+  border-color: rgba(232,168,56,.4);
 }
 
 .tag-actions {

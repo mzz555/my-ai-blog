@@ -23,7 +23,12 @@
           <div class="cat-icon" :style="iconStyle(i)">{{ cat.name.charAt(0) }}</div>
           <div class="cat-meta">
             <span class="cat-name">{{ cat.name }}</span>
-            <span class="cat-badge" :style="badgeStyle(i)">{{ cat.articleCount ?? 0 }}篇</span>
+            <span
+            class="cat-badge"
+            :class="{ 'cat-badge--link': (cat.articleCount ?? 0) > 0 }"
+            :style="badgeStyle(i)"
+            @click="(cat.articleCount ?? 0) > 0 && router.push(`/admin/articles?categoryId=${cat.id}`)"
+          >{{ cat.articleCount ?? 0 }}篇</span>
           </div>
         </div>
         <p class="cat-desc">{{ cat.description || cat.slug || '—' }}</p>
@@ -74,17 +79,20 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { getCategories, createCategory, updateCategory, deleteCategory } from '@/api/category'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
+const router = useRouter()
+
 const PALETTE = [
-  { iconBg: '#1A0B2E', iconFg: '#7C3AED', badgeBg: '#2E1A40', badgeFg: '#A855F7' },
-  { iconBg: '#0A2A14', iconFg: '#22C55E', badgeBg: '#14532D', badgeFg: '#4ADE80' },
-  { iconBg: '#231E0F', iconFg: '#E8A838', badgeBg: '#2B2210', badgeFg: '#E8A838' },
-  { iconBg: '#0D1A33', iconFg: '#3B82F6', badgeBg: '#1E3A5F', badgeFg: '#60A5FA' },
-  { iconBg: '#1A0D2E', iconFg: '#A855F7', badgeBg: '#2E1A40', badgeFg: '#C084FC' },
-  { iconBg: '#1C1A0A', iconFg: '#F59E0B', badgeBg: '#2B2210', badgeFg: '#FBBF24' },
+  { iconBg: 'rgba(124,58,237,.12)',  iconFg: '#7C3AED', badgeBg: 'rgba(168,85,247,.12)',  badgeFg: '#A855F7' },
+  { iconBg: 'rgba(34,197,94,.12)',   iconFg: '#16A34A', badgeBg: 'rgba(34,197,94,.12)',   badgeFg: '#16A34A' },
+  { iconBg: 'rgba(232,168,56,.12)',  iconFg: '#D97706', badgeBg: 'rgba(232,168,56,.12)',  badgeFg: '#D97706' },
+  { iconBg: 'rgba(59,130,246,.12)',  iconFg: '#2563EB', badgeBg: 'rgba(96,165,250,.12)',  badgeFg: '#2563EB' },
+  { iconBg: 'rgba(168,85,247,.12)',  iconFg: '#9333EA', badgeBg: 'rgba(192,132,252,.12)', badgeFg: '#9333EA' },
+  { iconBg: 'rgba(245,158,11,.12)',  iconFg: '#D97706', badgeBg: 'rgba(251,191,36,.12)',  badgeFg: '#B45309' },
 ]
 function iconStyle(i) { const p = PALETTE[i % PALETTE.length]; return { background: p.iconBg, color: p.iconFg } }
 function badgeStyle(i) { const p = PALETTE[i % PALETTE.length]; return { background: p.badgeBg, color: p.badgeFg } }
@@ -134,15 +142,19 @@ async function handleSave() {
     ElMessage.success('保存成功')
     dialogVisible.value = false
     load()
+  } catch {
   } finally {
     saving.value = false
   }
 }
 
 async function handleDelete(id) {
-  await deleteCategory(id)
-  ElMessage.success('已删除')
-  load()
+  try {
+    await deleteCategory(id)
+    ElMessage.success('已删除')
+    load()
+  } catch {
+  }
 }
 
 onMounted(load)
@@ -205,7 +217,9 @@ onMounted(load)
 
 .cat-meta { display: flex; align-items: center; gap: 8px; flex: 1; }
 .cat-name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
-.cat-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.cat-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; transition: opacity 0.15s; }
+.cat-badge--link { cursor: pointer; }
+.cat-badge--link:hover { opacity: 0.7; }
 
 .cat-desc { margin: 0; font-size: 12px; color: var(--color-text-tertiary); line-height: 1.5; flex: 1; }
 

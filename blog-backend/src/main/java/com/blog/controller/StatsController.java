@@ -20,6 +20,12 @@ public class StatsController {
         return Result.success(statsService.getOverview());
     }
 
+    @GetMapping("/trend")
+    @PreAuthorize("isAuthenticated()")
+    public Result<Map<String, Object>> trend() {
+        return Result.success(statsService.getTrend());
+    }
+
     @PostMapping("/articles/{id}/view")
     public Result<Void> recordView(@PathVariable Long id) {
         statsService.incrementViewCount(id);

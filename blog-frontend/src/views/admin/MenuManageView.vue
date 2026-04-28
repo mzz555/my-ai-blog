@@ -1,7 +1,10 @@
 <template>
   <div class="mm-page">
     <div class="page-head">
-      <h2 class="page-title">菜单管理</h2>
+      <div>
+        <h2 class="page-title">菜单管理</h2>
+        <p class="page-sub">共 {{ flatMenus.length }} 个菜单</p>
+      </div>
       <button class="btn-add" @click="openCreate(null)">
         <span class="btn-icon">+</span> 新建菜单
       </button>
@@ -10,12 +13,12 @@
     <el-table
       :data="menus"
       v-loading="loading"
-      border
       row-key="id"
       default-expand-all
       :tree-props="{ children: 'children' }"
       class="mm-table"
     >
+      <el-table-column type="index" label="#" width="52" align="center" />
       <el-table-column prop="name" label="菜单名称" min-width="160" />
       <el-table-column prop="path" label="路径" min-width="160">
         <template #default="{ row }">
@@ -35,9 +38,27 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="160" fixed="right">
+      <el-table-column label="操作" width="196" fixed="right">
         <template #default="{ row }">
           <div class="action-btns">
+            <!-- 上移 / 下移 -->
+            <button
+              class="icon-btn sort-btn"
+              title="上移"
+              :disabled="isFirst(row)"
+              @click="moveUp(row)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+            <button
+              class="icon-btn sort-btn"
+              title="下移"
+              :disabled="isLast(row)"
+              @click="moveDown(row)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <!-- 新增子菜单 / 编辑 / 删除 -->
             <button class="icon-btn add-child-btn" @click="openCreate(row.id)" title="新增子菜单">
               <Plus />
             </button>
@@ -96,7 +117,7 @@
           </div>
           <div class="form-field vis-field">
             <label class="form-label">是否显示</label>
-            <el-switch v-model="form.visible" active-color="var(--color-primary)" />
+            <el-switch v-model="form.visible" active-color="var(--color-accent)" />
           </div>
         </div>
       </div>
@@ -131,13 +152,55 @@ const flatMenus = computed(() => {
   return result
 })
 
+function getSiblings(row) {
+  return flatMenus.value
+    .filter(m => (m.parentId ?? null) === (row.parentId ?? null))
+    .sort((a, b) => a.sort - b.sort)
+}
+
+function isFirst(row) {
+  const s = getSiblings(row)
+  return s.length === 0 || s[0].id === row.id
+}
+
+function isLast(row) {
+  const s = getSiblings(row)
+  return s.length === 0 || s[s.length - 1].id === row.id
+}
+
+function toPayload(row, newSort) {
+  return { name: row.name, path: row.path, icon: row.icon, sort: newSort, visible: row.visible, parentId: row.parentId ?? null }
+}
+
+async function moveUp(row) {
+  const siblings = getSiblings(row)
+  const idx = siblings.findIndex(m => m.id === row.id)
+  if (idx <= 0) return
+  const prev = siblings[idx - 1]
+  await Promise.all([
+    updateMenu(row.id, toPayload(row, prev.sort)),
+    updateMenu(prev.id, toPayload(prev, row.sort))
+  ])
+  loadMenus()
+}
+
+async function moveDown(row) {
+  const siblings = getSiblings(row)
+  const idx = siblings.findIndex(m => m.id === row.id)
+  if (idx >= siblings.length - 1) return
+  const next = siblings[idx + 1]
+  await Promise.all([
+    updateMenu(row.id, toPayload(row, next.sort)),
+    updateMenu(next.id, toPayload(next, row.sort))
+  ])
+  loadMenus()
+}
+
 async function loadMenus() {
   loading.value = true
   try {
     const res = await getMenus()
     menus.value = res.data || []
-  } catch {
-    ElMessage.error('加载菜单失败，请刷新重试')
   } finally {
     loading.value = false
   }
@@ -182,8 +245,7 @@ async function handleSave() {
     }
     dialogVisible.value = false
     loadMenus()
-  } catch (e) {
-    ElMessage.error(e?.response?.data?.message || '操作失败')
+  } catch {
   } finally {
     saving.value = false
   }
@@ -194,8 +256,7 @@ async function handleDelete(id) {
     await deleteMenu(id)
     ElMessage.success('删除成功')
     loadMenus()
-  } catch (e) {
-    ElMessage.error(e?.response?.data?.message || '删除失败')
+  } catch {
   }
 }
 
@@ -211,13 +272,16 @@ onMounted(loadMenus)
   justify-content: space-between;
 }
 .page-title { margin: 0 0 4px; font-size: 22px; font-weight: 700; color: var(--color-text-primary); }
+.page-sub { margin: 0; font-size: 13px; color: var(--color-text-tertiary); }
+
+.mm-table { border-radius: var(--radius-lg); overflow: hidden; }
 
 .btn-add {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 9px 18px;
-  background: var(--color-primary);
+  background: var(--color-accent);
   color: #0C0C10;
   border: none;
   border-radius: var(--radius-md);
@@ -229,7 +293,7 @@ onMounted(loadMenus)
 .btn-add:hover { background: #F5BC50; }
 .btn-icon { font-size: 18px; line-height: 1; }
 
-.path-code { font-family: monospace; font-size: 13px; color: var(--color-primary); }
+.path-code { font-family: monospace; font-size: 13px; color: var(--color-accent); }
 .icon-text { font-size: 13px; color: var(--color-text-secondary); }
 
 .vis-dot {
@@ -255,9 +319,13 @@ onMounted(loadMenus)
   transition: background var(--transition-fast);
 }
 .icon-btn svg { width: 14px; height: 14px; }
+.sort-btn { background: var(--color-surface); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+.sort-btn:hover:not(:disabled) { border-color: var(--color-accent); color: var(--color-accent); }
+.sort-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+.sort-btn svg { width: 13px; height: 13px; }
 .add-child-btn { background: rgba(99,102,241,.12); color: #818CF8; }
 .add-child-btn:hover { background: rgba(99,102,241,.24); }
-.edit-btn { background: rgba(232,168,56,.15); color: var(--color-primary); }
+.edit-btn { background: rgba(232,168,56,.15); color: var(--color-accent); }
 .edit-btn:hover { background: rgba(232,168,56,.28); }
 .del-btn { background: rgba(239,68,68,.12); color: #EF4444; }
 .del-btn:hover { background: rgba(239,68,68,.24); }
@@ -278,7 +346,7 @@ onMounted(loadMenus)
   outline: none;
   transition: border-color var(--transition-fast);
 }
-.form-input:focus { border-color: var(--color-primary); }
+.form-input:focus { border-color: var(--color-accent); }
 .form-select {
   padding: 10px 14px;
   background: var(--color-bg);
@@ -289,7 +357,7 @@ onMounted(loadMenus)
   outline: none;
   cursor: pointer;
 }
-.form-select:focus { border-color: var(--color-primary); }
+.form-select:focus { border-color: var(--color-accent); }
 
 .btn-cancel, .btn-save {
   padding: 9px 24px;
@@ -301,8 +369,8 @@ onMounted(loadMenus)
   margin-left: 10px;
 }
 .btn-cancel { background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
-.btn-cancel:hover { border-color: var(--color-primary); color: var(--color-primary); }
-.btn-save { background: var(--color-primary); color: #0C0C10; border: none; font-weight: 600; }
+.btn-cancel:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.btn-save { background: var(--color-accent); color: #0C0C10; border: none; font-weight: 600; }
 .btn-save:hover:not(:disabled) { background: #F5BC50; }
 .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 

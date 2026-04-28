@@ -199,7 +199,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<ArticleListResponse> listAll(int page, int size, String keyword, String status) {
+    public PageResult<ArticleListResponse> listAll(int page, int size, String keyword, String status, Long categoryId, Long tagId) {
         var query = Wrappers.<Article>lambdaQuery();
         if (keyword != null && !keyword.isBlank()) {
             query.like(Article::getTitle, keyword.trim());
@@ -208,6 +208,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             try {
                 query.eq(Article::getStatus, Article.ArticleStatus.valueOf(status));
             } catch (IllegalArgumentException ignored) {}
+        }
+        if (categoryId != null) {
+            query.eq(Article::getCategoryId, categoryId);
+        }
+        if (tagId != null) {
+            List<Long> ids = this.baseMapper.selectIdsByTagId(tagId);
+            if (ids.isEmpty()) return PageResult.of(List.of(), 0L, page, size);
+            query.in(Article::getId, ids);
         }
         query.orderByDesc(Article::getCreatedAt);
         Page<Article> pageData = this.page(new Page<>(page, size), query);
@@ -271,6 +279,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             r.setAuthorName(a.getAuthor().getUsername());
         }
         if (a.getCategory() != null) {
+            r.setCategoryId(a.getCategory().getId());
             r.setCategoryName(a.getCategory().getName());
         }
         if (a.getTags() != null) {

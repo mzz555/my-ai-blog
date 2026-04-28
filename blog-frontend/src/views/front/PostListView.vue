@@ -19,9 +19,10 @@
           <template v-else>
             <div class="article-grid">
               <ArticleCard
-                v-for="article in articles"
+                v-for="(article, i) in articles"
                 :key="article.id"
                 :article="article"
+                :style="{ animationDelay: i * 70 + 'ms' }"
               />
             </div>
             <el-empty v-if="!articles.length" description="暂无文章" />
@@ -244,7 +245,7 @@ onMounted(async () => {
   transition: background 0.15s, color 0.15s;
 }
 .cat-item:hover { background: var(--color-surface); color: var(--color-text-primary); }
-.cat-item.active { color: var(--color-primary); }
+.cat-item.active { color: var(--color-accent); }
 .cat-dot {
   width: 6px;
   height: 6px;
@@ -253,7 +254,7 @@ onMounted(async () => {
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.cat-item.active .cat-dot { background: var(--color-primary); }
+.cat-item.active .cat-dot { background: var(--color-accent); }
 
 /* 标签 cloud */
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -266,24 +267,8 @@ onMounted(async () => {
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.tag-pill:hover { border-color: var(--color-primary); color: var(--color-primary); }
-.tag-pill.active { border-color: var(--color-primary); color: var(--color-primary); }
-
-/* ── 分页样式 ── */
-:deep(.el-pagination .el-pager li.is-active) {
-  background: #E8A838;
-  color: #000;
-  border-radius: 6px;
-}
-:deep(.el-pagination .el-pager li) {
-  background: #13131E;
-  color: #9CA3AF;
-  border-radius: 6px;
-}
-:deep(.el-pagination button) {
-  background: #13131E;
-  color: #9CA3AF;
-}
+.tag-pill:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.tag-pill.active { border-color: var(--color-accent); color: var(--color-accent); }
 
 /* ── 响应式 ── */
 @media (max-width: 1024px) {

@@ -48,6 +48,14 @@ public class Comment {
     @TableField(exist = false)
     private User user;
 
+    /** 所属文章，非数据库字段，由 Service 层填充（仅管理端使用） */
+    @TableField(exist = false)
+    private Article article;
+
+    /** 父评论昵称，非数据库字段，由 Service 层填充（仅管理端使用） */
+    @TableField(exist = false)
+    private String parentNickname;
+
     /**
      * 评论审核状态枚举
      */

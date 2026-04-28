@@ -48,36 +48,43 @@ function isActive(path) {
 <style scoped>
 .sidebar-wrap {
   height: 100%;
-  background: #111119;
+  background: var(--color-sidebar-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-right: 1px solid #1E1E2C;
+  border-right: 1px solid var(--color-sidebar-border);
+  transition: background var(--transition-base), border-color var(--transition-base);
 }
 
+/* Logo 区域 — 与 nav-item 左边缘对齐 */
 .sidebar-logo {
-  height: 64px;
+  height: 56px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid #1E1E2C;
+  border-bottom: 1px solid var(--color-sidebar-border);
   flex-shrink: 0;
-  padding: 0 20px;
-  gap: 10px;
+  padding: 0 10px 0 14px;
+  transition: border-color var(--transition-base);
 }
 
 .logo-text {
-  font-size: 18px;
-  font-weight: 700;
-  color: #F0F0F8;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-sidebar-logo);
   white-space: nowrap;
+  letter-spacing: -0.3px;
+  transition: color var(--transition-base);
 }
-
 .logo-dot { color: #E8A838; }
 
+/* 折叠时居中显示单字母 */
 .logo-only {
-  font-size: 18px;
-  font-weight: 700;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
   color: #E8A838;
 }
 
@@ -85,8 +92,8 @@ function isActive(path) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px 12px;
+  gap: 2px;
+  padding: 10px 8px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -94,26 +101,38 @@ function isActive(path) {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  height: 40px;
-  padding: 0 8px;
+  gap: 0;
+  height: 38px;
+  padding: 0 6px;
   border-radius: 6px;
-  color: #6E6E82;
+  color: var(--color-sidebar-text);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 .nav-item:hover:not(.active) {
-  background: #16162A;
-  color: #9CA3AF;
+  background: var(--color-sidebar-hover-bg);
+  color: var(--color-text-primary);
 }
 .nav-item.active {
-  background: #1E1E30;
-  color: #E8A838;
+  background: var(--color-sidebar-active-bg);
+  color: var(--color-sidebar-active);
   font-weight: 600;
 }
 
-.nav-label { flex: 1; }
+/* icon 固定宽度，保证折叠/展开时文字不抖动 */
+.nav-item :deep(.el-icon) {
+  width: 32px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>

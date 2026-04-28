@@ -67,8 +67,9 @@ public class CommentController {
     @PreAuthorize("hasAuthority('comment:list')")
     public Result<PageResult<CommentResponse>> adminList(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return Result.success(commentService.listAllForAdmin(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status) {
+        return Result.success(commentService.listAllForAdmin(page, size, status));
     }
 
     /**

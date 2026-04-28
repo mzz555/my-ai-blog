@@ -60,8 +60,10 @@ public class ArticleController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String status) {
-        return Result.success(articleService.listAll(page, size, keyword, status));
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long tagId) {
+        return Result.success(articleService.listAll(page, size, keyword, status, categoryId, tagId));
     }
 
     /**

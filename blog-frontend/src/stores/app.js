@@ -8,7 +8,12 @@ export const useAppStore = defineStore('app', () => {
 
   function toggleSidebar() { sidebarCollapsed.value = !sidebarCollapsed.value }
   function setLoading(val) { loading.value = val }
-  function toggleDarkMode() { darkMode.value = !darkMode.value }
+  function toggleDarkMode() {
+    const el = document.documentElement
+    el.classList.add('theme-switching')
+    darkMode.value = !darkMode.value
+    setTimeout(() => el.classList.remove('theme-switching'), 400)
+  }
 
   watch(darkMode, (val) => {
     localStorage.setItem('theme', val ? 'dark' : 'light')

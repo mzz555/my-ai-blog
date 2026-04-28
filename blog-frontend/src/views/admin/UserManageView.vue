@@ -63,7 +63,6 @@
 
     <div class="pagination-wrap">
       <el-pagination
-        v-if="total > pageSize"
         background
         layout="total, prev, pager, next"
         :total="total"
@@ -143,7 +142,6 @@ async function toggleStatus(row, enabled) {
     row.status = newStatus
     ElMessage.success(enabled ? '已启用' : '已禁用')
   } catch {
-    ElMessage.error('操作失败')
   }
 }
 
@@ -162,6 +160,7 @@ async function handleSaveUser() {
     ElMessage.success('保存成功')
     editVisible.value = false
     fetchUsers(page.value)
+  } catch {
   } finally {
     saving.value = false
   }
