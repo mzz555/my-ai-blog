@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.common.PageResult;
 import com.blog.common.exception.NotFoundException;
+import com.blog.dto.user.UserCreateDTO;
 import com.blog.dto.user.UserUpdateDTO;
 import com.blog.entity.Role;
 import com.blog.entity.User;
@@ -63,5 +64,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 "SELECT role_id FROM user_roles WHERE user_id = " + id));
         user.setRoles(roles);
         return user;
+    }
+
+    @Override
+    public User createUser(UserCreateDTO dto) {
+        throw new UnsupportedOperationException("尚未实现");
     }
 }
