@@ -101,9 +101,18 @@
       <!-- 状态 -->
       <el-table-column label="状态" width="86" align="center">
         <template #default="{ row }">
-          <span :class="['status-dot', row.status === 'PUBLISHED' ? 'status-dot--pub' : 'status-dot--draft']">
+          <button
+            class="status-dot"
+            :class="[
+              row.status === 'PUBLISHED' ? 'status-dot--pub' : 'status-dot--draft',
+              { 'status-dot--clickable': canToggle }
+            ]"
+            :disabled="!canToggle || togglingId === row.id"
+            :title="canToggle ? (row.status === 'PUBLISHED' ? '点击撤回为草稿' : '点击发布') : '无发布权限'"
+            @click="handleToggle(row)"
+          >
             {{ row.status === 'PUBLISHED' ? '已发布' : '草稿' }}
-          </span>
+          </button>
         </template>
       </el-table-column>
 
@@ -176,12 +185,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getAdminArticles, deleteArticle } from '@/api/article'
+import { getAdminArticles, deleteArticle, togglePublish } from '@/api/article'
 import { getCategories } from '@/api/category'
 import { getTags } from '@/api/tag'
 import { formatDate } from '@/utils/format'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Edit, Delete, Picture, Warning } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const router = useRouter()
@@ -201,6 +211,10 @@ const tags = ref([])
 const deleteDialogVisible = ref(false)
 const deleteTarget = ref(null)
 const deleting = ref(false)
+
+const userStore = useUserStore()
+const canToggle = computed(() => userStore.hasPermission('article:publish'))
+const togglingId = ref(null)
 
 const hasFilter = computed(() =>
   keyword.value || categoryFilter.value || tagFilter.value || statusFilter.value
@@ -257,6 +271,32 @@ async function confirmDelete() {
     loadArticles(page.value)
   } finally {
     deleting.value = false
+  }
+}
+
+async function handleToggle(row) {
+  if (!canToggle.value) return
+  if (row.status === 'PUBLISHED') {
+    try {
+      await ElMessageBox.confirm(
+        `确认将文章「${row.title}」撤回为草稿？前台将不再可见。`,
+        '撤回文章',
+        { type: 'warning', confirmButtonText: '确认撤回', cancelButtonText: '取消' }
+      )
+    } catch {
+      return
+    }
+  }
+  togglingId.value = row.id
+  try {
+    await togglePublish(row.id)
+    row.status = row.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED'
+    if (row.status === 'PUBLISHED' && !row.publishedAt) {
+      row.publishedAt = new Date().toISOString()
+    }
+    ElMessage.success(row.status === 'PUBLISHED' ? '已发布' : '已撤回为草稿')
+  } finally {
+    togglingId.value = null
   }
 }
 
@@ -402,6 +442,16 @@ onMounted(async () => {
 }
 .status-dot--pub   { background: rgba(34,197,94,.12);  color: #22C55E; border: 1px solid rgba(34,197,94,.25); }
 .status-dot--draft { background: rgba(107,114,128,.1); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+
+/* 行内状态切换的可点态 */
+.status-dot {
+  font-family: inherit;
+  cursor: default;
+  transition: opacity .15s, transform .15s;
+}
+.status-dot--clickable { cursor: pointer; }
+.status-dot--clickable:hover { opacity: .8; transform: scale(1.04); }
+.status-dot--clickable:disabled { cursor: wait; opacity: .6; transform: none; }
 
 .num-text { font-size: 13px; color: var(--color-text-secondary); }
 .date-text { font-size: 12px; color: var(--color-text-tertiary); }
