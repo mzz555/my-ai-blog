@@ -52,7 +52,7 @@ function isActive(path) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-right: 1px solid var(--color-sidebar-border);
+  border-right: 1px solid var(--color-card-border);
   transition: background var(--transition-base), border-color var(--transition-base);
 }
 
@@ -61,7 +61,7 @@ function isActive(path) {
   height: 56px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--color-sidebar-border);
+  border-bottom: 1px solid var(--color-card-border);
   flex-shrink: 0;
   padding: 0 10px 0 14px;
   transition: border-color var(--transition-base);
