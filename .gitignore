@@ -1,0 +1,25 @@
+# IDE / 工具目录
+.idea/
+.claude/
+.vscode/
+
+# brainstorm 本地素材（不入库）
+.superpowers/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 后端构建
+blog-backend/target/
+*.class
+*.log
+
+# 前端依赖与构建
+blog-frontend/node_modules/
+blog-frontend/dist/
+blog-frontend/.vite/
+
+# 环境配置
+*.env.local
+*.env.*.local
