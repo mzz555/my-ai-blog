@@ -104,7 +104,7 @@ function handleLogout() {
 .admin-layout {
   display: flex;
   height: 100vh;
-  background: var(--color-bg-tertiary);
+  background: var(--color-bg);
   overflow: hidden;
   transition: background var(--transition-base);
 }
@@ -127,13 +127,18 @@ function handleLogout() {
 
 .admin-header {
   height: var(--header-height);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--color-header-bg);
+  backdrop-filter: blur(var(--color-header-blur));
+  -webkit-backdrop-filter: blur(var(--color-header-blur));
+  border-bottom: 1px solid var(--color-header-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-5);
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   transition: background var(--transition-base), border-color var(--transition-base);
 }
 
@@ -261,8 +266,8 @@ function handleLogout() {
 .admin-main {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-6);
-  background: var(--color-bg-tertiary);
+  padding: var(--space-5) var(--space-6) var(--space-6);
+  background: var(--color-bg);
   transition: background var(--transition-base);
 }
 
