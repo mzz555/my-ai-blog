@@ -2,6 +2,7 @@ package com.blog.controller;
 
 import com.blog.common.PageResult;
 import com.blog.common.Result;
+import com.blog.dto.user.UserCreateDTO;
 import com.blog.dto.user.UserUpdateDTO;
 import com.blog.entity.User;
 import com.blog.service.UserService;
@@ -37,5 +38,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:list')")
     public Result<User> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         return Result.success(userService.updateUser(id, dto));
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('user:list')")
+    public Result<User> create(@Valid @RequestBody UserCreateDTO dto) {
+        return Result.success(userService.createUser(dto));
     }
 }
