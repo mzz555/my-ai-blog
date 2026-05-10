@@ -5,15 +5,20 @@
         <h2 class="page-title">用户管理</h2>
         <p class="page-sub">共 {{ total }} 位用户</p>
       </div>
-      <el-input
-        v-model="keyword"
-        placeholder="搜索用户名 / 昵称"
-        clearable
-        class="search-input"
-        @input="handleSearch"
-      >
-        <template #prefix><el-icon><Search /></el-icon></template>
-      </el-input>
+      <div class="head-right">
+        <el-input
+          v-model="keyword"
+          placeholder="搜索用户名 / 昵称"
+          clearable
+          class="search-input"
+          @input="handleSearch"
+        >
+          <template #prefix><el-icon><Search /></el-icon></template>
+        </el-input>
+        <el-button type="primary" @click="openCreate">
+          <el-icon><Plus /></el-icon> 新建用户
+        </el-button>
+      </div>
     </div>
 
     <el-table :data="users" v-loading="loading" class="data-table">
@@ -72,6 +77,43 @@
       />
     </div>
 
+    <el-dialog v-model="createVisible" title="新建用户" width="480px" destroy-on-close>
+      <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-position="top">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="createForm.username" placeholder="3-50 位字母/数字/下划线/连字符" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="createForm.email" placeholder="user@example.com" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="createForm.password" type="password" show-password placeholder="6-50 位" />
+        </el-form-item>
+        <el-form-item label="昵称">
+          <el-input v-model="createForm.nickname" placeholder="留空时使用用户名" />
+        </el-form-item>
+        <el-form-item label="分配角色">
+          <el-checkbox-group v-model="createForm.roleIds" class="role-check-group">
+            <el-checkbox v-for="r in allRoles" :key="r.id" :label="r.id">{{ r.name }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-switch
+            v-model="createForm.status"
+            :active-value="1"
+            :inactive-value="0"
+            active-text="启用"
+            inactive-text="禁用"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="createVisible = false">取消</el-button>
+          <el-button type="primary" :loading="createSaving" @click="handleCreate">创建</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="editVisible" title="编辑用户" width="440px" destroy-on-close>
       <div class="form-body">
         <div class="form-item">
@@ -101,10 +143,10 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getUsers, updateUserStatus, updateUser } from '@/api/user'
+import { getUsers, updateUserStatus, updateUser, createUser } from '@/api/user'
 import { getRoles } from '@/api/role'
 import { ElMessage } from 'element-plus'
-import { Search, Edit } from '@element-plus/icons-vue'
+import { Search, Edit, Plus } from '@element-plus/icons-vue'
 
 const users = ref([])
 const allRoles = ref([])
@@ -116,6 +158,64 @@ const keyword = ref('')
 const editVisible = ref(false)
 const saving = ref(false)
 const editForm = reactive({ id: null, username: '', nickname: '', roleIds: [] })
+
+const createVisible = ref(false)
+const createSaving = ref(false)
+const createFormRef = ref(null)
+const createForm = reactive({
+  username: '',
+  email: '',
+  password: '',
+  nickname: '',
+  roleIds: [],
+  status: 1,
+})
+const createRules = {
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 3, max: 50, message: '用户名 3-50 位', trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9_-]+$/, message: '只能包含字母、数字、下划线、连字符', trigger: 'blur' },
+  ],
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '邮箱格式不正确', trigger: 'blur' },
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 50, message: '密码 6-50 位', trigger: 'blur' },
+  ],
+}
+
+function openCreate() {
+  createForm.username = ''
+  createForm.email = ''
+  createForm.password = ''
+  createForm.nickname = ''
+  createForm.roleIds = []
+  createForm.status = 1
+  createVisible.value = true
+}
+
+async function handleCreate() {
+  const valid = await createFormRef.value?.validate().catch(() => false)
+  if (!valid) return
+  createSaving.value = true
+  try {
+    await createUser({
+      username: createForm.username.trim(),
+      email: createForm.email.trim(),
+      password: createForm.password,
+      nickname: createForm.nickname.trim() || null,
+      roleIds: createForm.roleIds,
+      status: createForm.status,
+    })
+    ElMessage.success('用户已创建')
+    createVisible.value = false
+    fetchUsers(1)
+  } finally {
+    createSaving.value = false
+  }
+}
 
 let searchTimer = null
 function handleSearch() {
@@ -255,4 +355,5 @@ onMounted(async () => {
 .dialog-footer { display: flex; justify-content: flex-end; gap: 10px; }
 
 :deep(.el-table__row) { height: 60px; }
+.head-right { display: flex; align-items: center; gap: 12px; }
 </style>
