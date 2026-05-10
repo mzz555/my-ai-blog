@@ -27,9 +27,10 @@
   --color-success: #22c55e;
   --color-warning: #f59e0b;
 
-  --color-header-bg:          rgba(255, 255, 255, 0.95);
-  --color-header-border:      #E5E7EB;
-  --color-sidebar-bg:         #FFFFFF;
+  --color-header-bg:          transparent;
+  --color-header-blur:        10px;
+  --color-header-border:      transparent;
+  --color-sidebar-bg:         #F7F7F2;
   --color-sidebar-border:     #E5E7EB;
   --color-sidebar-logo:       #111827;
   --color-sidebar-text:       #6B7280;
@@ -73,6 +74,12 @@
   --sidebar-collapsed-width:56px;
   --content-max-width:      1440px;
   --prose-max-width:        780px;
+
+  /* ── Soft Modern card (B 批新增) ── */
+  --color-card-surface:       #FFFFFF;
+  --color-card-border:        rgba(0,0,0,.06);
+  --radius-card:              14px;
+  --shadow-card-elevate:      0 8px 32px rgba(0,0,0,.06);
 }
 
 /* Dark theme — 用 html[data-theme='dark'] 保证优先级(0,1,1)高于 EP 按需注入的 :root(0,1,0) */
@@ -145,9 +152,10 @@ html[data-theme='dark'] {
   --color-accent-border: #3A3010;
   --color-accent-text:   #E8A838;
 
-  --color-header-bg:          rgba(12, 12, 16, 0.95);
-  --color-header-border:      #1C1C2C;
-  --color-sidebar-bg:         #111119;
+  --color-header-bg:          transparent;
+  --color-header-blur:        10px;
+  --color-header-border:      transparent;
+  --color-sidebar-bg:         #0C0C10;
   --color-sidebar-border:     #1E1E2C;
   --color-sidebar-logo:       #F0F0F8;
   --color-sidebar-text:       #6E6E82;
@@ -160,6 +168,12 @@ html[data-theme='dark'] {
   --shadow-lg:        0 10px 32px rgba(0,0,0,.6),  0 4px 8px rgba(0,0,0,.5);
   --shadow-card:      0 2px 8px rgba(0,0,0,.5);
   --shadow-card-hover:0 8px 32px rgba(0,0,0,.6);
+
+  /* ── Soft Modern card (B 批新增) ── */
+  --color-card-surface:       rgba(255,255,255,.025);
+  --color-card-border:        rgba(255,255,255,.06);
+  --radius-card:              14px;
+  --shadow-card-elevate:      0 8px 32px rgba(0,0,0,.25);
 }
 
 /* ── Global resets ── */
