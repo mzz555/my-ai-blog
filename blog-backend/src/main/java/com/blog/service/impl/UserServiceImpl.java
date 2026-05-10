@@ -16,6 +16,7 @@ import com.blog.mapper.UserRoleMapper;
 import com.blog.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -28,6 +29,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private RoleMapper roleMapper;
     @Autowired
     private UserRoleMapper userRoleMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public PageResult<User> listUsers(int page, int size, String keyword) {
@@ -67,7 +70,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @Transactional
     public User createUser(UserCreateDTO dto) {
-        throw new UnsupportedOperationException("尚未实现");
+        if (this.count(Wrappers.<User>lambdaQuery().eq(User::getUsername, dto.getUsername())) > 0) {
+            throw new IllegalArgumentException("用户名已存在");
+        }
+        if (this.count(Wrappers.<User>lambdaQuery().eq(User::getEmail, dto.getEmail())) > 0) {
+            throw new IllegalArgumentException("邮箱已被注册");
+        }
+
+        User user = new User();
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setNickname(
+            dto.getNickname() == null || dto.getNickname().isBlank()
+                ? dto.getUsername()
+                : dto.getNickname()
+        );
+        user.setStatus(dto.getStatus() == null ? 1 : dto.getStatus());
+        this.save(user);
+
+        if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
+            for (Long roleId : dto.getRoleIds()) {
+                userRoleMapper.insert(new UserRole(user.getId(), roleId));
+            }
+        }
+
+        user.setPassword(null);
+        return user;
     }
 }

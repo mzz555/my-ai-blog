@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     username    VARCHAR(50)  NOT NULL,
     email       VARCHAR(100) NOT NULL,
     password    VARCHAR(255) NOT NULL,
+    nickname    VARCHAR(50),
     avatar      VARCHAR(255),
     bio         TEXT,
     status      TINYINT      NOT NULL DEFAULT 1,
