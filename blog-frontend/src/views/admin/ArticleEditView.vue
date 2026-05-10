@@ -36,7 +36,7 @@
         <div style="display:flex;align-items:center;gap:12px">
           <img v-if="form.coverImage" :src="form.coverImage"
             style="width:120px;height:67px;object-fit:cover;border-radius:4px;border:1px solid var(--color-border)" />
-          <el-button size="small" :loading="coverUploading" @click="coverInput.click()">
+          <el-button size="small" @click="coverInput.click()">
             {{ form.coverImage ? '更换封面' : '上传封面' }}
           </el-button>
           <el-button v-if="form.coverImage" size="small" @click="form.coverImage = ''">移除</el-button>
@@ -64,6 +64,11 @@
         <el-button style="margin-left:12px" @click="$router.push('/admin/articles')">取消</el-button>
       </el-form-item>
     </el-form>
+    <CoverCropDialog
+      v-model:visible="cropDialogVisible"
+      :file="pendingFile"
+      @done="handleCropDone"
+    />
   </div>
 </template>
 
@@ -80,6 +85,7 @@ import { uploadImage } from '@/api/upload'
 import { ElMessage } from 'element-plus'
 import { useArticleDraft, clearDraft } from '@/composables/useArticleDraft'
 import { useWordCount } from '@/composables/useWordCount'
+import CoverCropDialog from '@/components/admin/CoverCropDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,8 +94,9 @@ const isEdit = computed(() => !!route.params.id)
 const editorTheme = computed(() => appStore.darkMode ? 'dark' : 'light')
 const formRef = ref(null)
 const saving = ref(false)
-const coverUploading = ref(false)
 const coverInput = ref(null)
+const cropDialogVisible = ref(false)
+const pendingFile = ref(null)
 const categories = ref([])
 const tags = ref([])
 
@@ -125,19 +132,16 @@ async function handleUpload(files, callback) {
   callback(results)
 }
 
-async function handleCoverChange(e) {
+function handleCoverChange(e) {
   const file = e.target.files?.[0]
+  e.target.value = ''
   if (!file) return
-  coverUploading.value = true
-  try {
-    const res = await uploadImage(file)
-    form.coverImage = res.data
-  } catch {
-    ElMessage.error('封面上传失败，请重试')
-  } finally {
-    coverUploading.value = false
-    e.target.value = ''
-  }
+  pendingFile.value = file
+  cropDialogVisible.value = true
+}
+
+function handleCropDone(url) {
+  form.coverImage = url
 }
 
 async function handleSave() {
