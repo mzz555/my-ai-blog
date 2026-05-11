@@ -1,25 +1,27 @@
 <template>
-  <div class="page-wrap">
-    <div class="page-head">
-      <div>
-        <h2 class="page-title">评论审核</h2>
-        <p class="page-sub">共 {{ total }} 条评论</p>
+  <AdminPageCard title="评论审核" :subtitle="`共 ${total} 条评论`">
+    <template #tabs>
+      <div class="status-tabs">
+        <button
+          v-for="tab in statusTabs"
+          :key="tab.value"
+          :class="['tab-btn', { active: statusFilter === tab.value }]"
+          @click="switchTab(tab.value)"
+        >
+          {{ tab.label }}
+          <span v-if="tab.value === 'PENDING' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
+        </button>
       </div>
-    </div>
+    </template>
 
-    <div class="status-tabs">
-      <button
-        v-for="tab in statusTabs"
-        :key="tab.value"
-        :class="['tab-btn', { active: statusFilter === tab.value }]"
-        @click="switchTab(tab.value)"
-      >
-        {{ tab.label }}
-        <span v-if="tab.value === 'PENDING' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
-      </button>
-    </div>
-
-    <el-table :data="comments" v-loading="loading" class="data-table">
+    <DataTable
+      :data="comments"
+      :loading="loading"
+      :total="total"
+      :page="page"
+      :page-size="pageSize"
+      @page-change="load"
+    >
 
       <el-table-column type="index" label="#" width="52" align="center" />
 
@@ -119,18 +121,7 @@
         </template>
       </el-table-column>
 
-    </el-table>
-
-    <div class="pagination-wrap">
-      <el-pagination
-        background
-        layout="total, prev, pager, next"
-        :total="total"
-        :page-size="pageSize"
-        :current-page="page"
-        @current-change="load"
-      />
-    </div>
+    </DataTable>
 
     <!-- 评论详情弹窗 -->
     <el-dialog
@@ -193,7 +184,7 @@
         </div>
       </div>
     </el-dialog>
-  </div>
+  </AdminPageCard>
 </template>
 
 <script setup>
@@ -201,6 +192,8 @@ import { ref, onMounted } from 'vue'
 import { getAdminComments, updateCommentStatus, deleteComment } from '@/api/comment'
 import { formatDate } from '@/utils/format'
 import { ElMessage } from 'element-plus'
+import AdminPageCard from '@/components/admin/AdminPageCard.vue'
+import DataTable from '@/components/admin/DataTable.vue'
 
 const comments = ref([])
 const loading = ref(false)
@@ -282,11 +275,6 @@ onMounted(() => { load(); loadPendingCount() })
 </script>
 
 <style scoped>
-.page-wrap { display: flex; flex-direction: column; gap: 20px; }
-.page-head { display: flex; justify-content: space-between; align-items: flex-start; }
-.page-title { margin: 0 0 4px; font-size: 22px; font-weight: 700; color: var(--color-text-primary); }
-.page-sub { margin: 0; font-size: 13px; color: var(--color-text-tertiary); }
-
 .status-tabs {
   display: flex; gap: 4px;
   background: var(--color-surface); border: 1px solid var(--color-border);
@@ -308,8 +296,6 @@ onMounted(() => { load(); loadPendingCount() })
   justify-content: center; background: #E8A838; color: #0C0C10;
   font-size: 10px; font-weight: 700; border-radius: var(--radius-full); padding: 0 5px;
 }
-
-.data-table { border-radius: var(--radius-lg); overflow: hidden; }
 
 .article-chip {
   display: inline-flex; align-items: center; gap: 4px;
@@ -387,11 +373,6 @@ onMounted(() => { load(); loadPendingCount() })
 .icon-btn--del     { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.25); color: #EF4444; }
 .icon-btn--del:hover { background: rgba(239,68,68,.18); }
 
-.pagination-wrap {
-  display: flex; justify-content: flex-end; align-items: center;
-  padding: 12px 0 4px; border-top: 1px solid var(--color-border);
-}
-
 /* 详情弹窗 */
 .detail-body { display: flex; flex-direction: column; gap: 20px; }
 
@@ -447,5 +428,5 @@ onMounted(() => { load(); loadPendingCount() })
 .da-btn--approve { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.3); color: #22C55E; }
 .da-btn--reject  { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: #EF4444; }
 
-:deep(.el-table__row) { height: 60px; }
+:deep(.data-table .el-table__row) { height: 60px; }
 </style>
