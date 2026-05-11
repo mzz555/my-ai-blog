@@ -23,3 +23,6 @@ blog-frontend/.vite/
 # 环境配置
 *.env.local
 *.env.*.local
+
+# 用户上传内容（应通过 UPLOAD_DIR 指向仓库外目录，下面这行是兜底防误提交）
+/uploads/
