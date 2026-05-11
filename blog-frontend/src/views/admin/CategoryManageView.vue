@@ -1,22 +1,18 @@
 <template>
-  <div class="page-wrap">
-    <div class="page-head">
-      <div>
-        <h2 class="page-title">分类管理</h2>
-        <p class="page-sub">共 {{ categories.length }} 个分类</p>
-      </div>
+  <AdminPageCard title="分类管理" :subtitle="`共 ${categories.length} 个分类`">
+    <template #actions>
       <el-button type="primary" @click="openDialog()">
         <el-icon><Plus /></el-icon> 新建分类
       </el-button>
-    </div>
+    </template>
 
-    <!-- 路由标签 -->
-    <div class="route-tabs">
-      <router-link to="/admin/categories" class="rtab rtab--active">分类管理</router-link>
-      <router-link to="/admin/tags" class="rtab">标签管理</router-link>
-    </div>
+    <template #tabs>
+      <div class="route-tabs">
+        <router-link to="/admin/categories" class="rtab rtab--active">分类管理</router-link>
+        <router-link to="/admin/tags" class="rtab">标签管理</router-link>
+      </div>
+    </template>
 
-    <!-- 卡片网格 -->
     <div v-loading="loading" class="cat-grid">
       <div v-for="(cat, i) in categories" :key="cat.id" class="cat-card">
         <div class="cat-card-top">
@@ -74,7 +70,7 @@
         </div>
       </template>
     </el-dialog>
-  </div>
+  </AdminPageCard>
 </template>
 
 <script setup>
@@ -83,6 +79,7 @@ import { useRouter } from 'vue-router'
 import { getCategories, createCategory, updateCategory, deleteCategory } from '@/api/category'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
+import AdminPageCard from '@/components/admin/AdminPageCard.vue'
 
 const router = useRouter()
 
@@ -161,11 +158,6 @@ onMounted(load)
 </script>
 
 <style scoped>
-.page-wrap { display: flex; flex-direction: column; gap: 20px; }
-.page-head { display: flex; justify-content: space-between; align-items: flex-start; }
-.page-title { margin: 0 0 4px; font-size: 22px; font-weight: 700; color: var(--color-text-primary); }
-.page-sub { margin: 0; font-size: 13px; color: var(--color-text-tertiary); }
-
 /* Route tabs */
 .route-tabs { display: flex; border-bottom: 1px solid var(--color-border); }
 .rtab {
