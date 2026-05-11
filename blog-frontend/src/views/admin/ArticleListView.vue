@@ -1,18 +1,15 @@
 <template>
-  <div class="page-wrap">
-    <!-- 页头 -->
-    <div class="page-head">
-      <div>
-        <h2 class="page-title">文章管理</h2>
-        <p class="page-sub">共 {{ total }} 篇文章</p>
-      </div>
+  <AdminPageCard
+    title="文章管理"
+    :subtitle="`共 ${total} 篇文章`"
+  >
+    <template #actions>
       <el-button type="primary" @click="$router.push('/admin/articles/new')">
         <el-icon><Plus /></el-icon> 写新文章
       </el-button>
-    </div>
+    </template>
 
-    <!-- 筛选栏 -->
-    <div class="filter-bar">
+    <template #filter>
       <el-input
         v-model="keyword"
         placeholder="搜索文章标题…"
@@ -39,18 +36,22 @@
 
       <el-button @click="search">搜索</el-button>
       <el-button v-if="hasFilter" @click="resetFilter">重置</el-button>
-    </div>
+    </template>
 
-    <!-- 表格 -->
-    <el-table :data="articles" v-loading="loading" class="article-table">
-      <!-- 序号 -->
+    <DataTable
+      :data="articles"
+      :loading="loading"
+      :total="total"
+      :page="page"
+      :page-size="pageSize"
+      @page-change="loadArticles"
+    >
       <el-table-column label="#" width="56" align="center">
         <template #default="{ $index }">
           <span class="seq-num">{{ (page - 1) * pageSize + $index + 1 }}</span>
         </template>
       </el-table-column>
 
-      <!-- 封面 -->
       <el-table-column label="封面" width="88">
         <template #default="{ row }">
           <div class="cover-cell">
@@ -60,7 +61,6 @@
         </template>
       </el-table-column>
 
-      <!-- 文章标题 + 摘要 -->
       <el-table-column label="文章" min-width="240">
         <template #default="{ row }">
           <div class="title-block">
@@ -72,7 +72,6 @@
         </template>
       </el-table-column>
 
-      <!-- 分类 -->
       <el-table-column label="分类" width="110">
         <template #default="{ row }">
           <span
@@ -84,7 +83,6 @@
         </template>
       </el-table-column>
 
-      <!-- 标签 -->
       <el-table-column label="标签" min-width="130">
         <template #default="{ row }">
           <div class="tag-wrap">
@@ -98,7 +96,6 @@
         </template>
       </el-table-column>
 
-      <!-- 状态 -->
       <el-table-column label="状态" width="86" align="center">
         <template #default="{ row }">
           <button
@@ -116,70 +113,32 @@
         </template>
       </el-table-column>
 
-      <!-- 阅读量 -->
       <el-table-column prop="viewCount" label="阅读" width="66" align="center">
         <template #default="{ row }">
           <span class="num-text">{{ row.viewCount ?? 0 }}</span>
         </template>
       </el-table-column>
 
-      <!-- 发布时间 -->
       <el-table-column label="发布时间" width="108">
         <template #default="{ row }">
           <span class="date-text">{{ row.publishedAt ? formatDate(row.publishedAt) : '—' }}</span>
         </template>
       </el-table-column>
 
-      <!-- 操作 -->
       <el-table-column label="操作" width="140" fixed="right">
         <template #default="{ row }">
           <div class="act-group">
             <button class="act-btn act-btn--edit" @click="$router.push(`/admin/articles/${row.id}/edit`)">
               <el-icon><Edit /></el-icon> 编辑
             </button>
-            <button class="act-btn act-btn--del" @click="openDelete(row)">
+            <button class="act-btn act-btn--del" @click="confirmDelete(row)">
               <el-icon><Delete /></el-icon> 删除
             </button>
           </div>
         </template>
       </el-table-column>
-    </el-table>
-
-    <div class="pagination-wrap">
-      <el-pagination
-        background
-        layout="total, prev, pager, next"
-        :total="total"
-        :page-size="pageSize"
-        :current-page="page"
-        @current-change="loadArticles"
-      />
-    </div>
-
-    <!-- 删除确认弹窗 -->
-    <el-dialog
-      v-model="deleteDialogVisible"
-      title="删除文章"
-      width="420px"
-      :close-on-click-modal="false"
-      class="delete-dialog"
-    >
-      <div class="delete-body">
-        <div class="delete-icon-wrap">
-          <el-icon class="delete-icon"><Warning /></el-icon>
-        </div>
-        <p class="delete-msg">确定要删除文章</p>
-        <p class="delete-title-preview">「{{ deleteTarget?.title }}」</p>
-        <p class="delete-hint">此操作不可撤销，文章将被永久删除。</p>
-      </div>
-      <template #footer>
-        <div class="delete-footer">
-          <el-button @click="deleteDialogVisible = false">取消</el-button>
-          <el-button type="danger" :loading="deleting" @click="confirmDelete">确认删除</el-button>
-        </div>
-      </template>
-    </el-dialog>
-  </div>
+    </DataTable>
+  </AdminPageCard>
 </template>
 
 <script setup>
@@ -190,8 +149,10 @@ import { getCategories } from '@/api/category'
 import { getTags } from '@/api/tag'
 import { formatDate } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search, Edit, Delete, Picture, Warning } from '@element-plus/icons-vue'
+import { Plus, Search, Edit, Delete, Picture } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
+import AdminPageCard from '@/components/admin/AdminPageCard.vue'
+import DataTable from '@/components/admin/DataTable.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -207,10 +168,6 @@ const tagFilter = ref(null)
 const statusFilter = ref('')
 const categories = ref([])
 const tags = ref([])
-
-const deleteDialogVisible = ref(false)
-const deleteTarget = ref(null)
-const deleting = ref(false)
 
 const userStore = useUserStore()
 const canToggle = computed(() => userStore.hasPermission('article:publish'))
@@ -256,21 +213,25 @@ function jumpFilter(type, id) {
   loadArticles(1)
 }
 
-function openDelete(row) {
-  deleteTarget.value = row
-  deleteDialogVisible.value = true
-}
-
-async function confirmDelete() {
-  if (!deleteTarget.value) return
-  deleting.value = true
+async function confirmDelete(row) {
   try {
-    await deleteArticle(deleteTarget.value.id)
+    await ElMessageBox.confirm(
+      `确认删除「${row.title}」？此操作不可撤销。`,
+      '删除确认',
+      {
+        type: 'warning',
+        confirmButtonText: '确认删除',
+        cancelButtonText: '取消',
+        confirmButtonClass: 'el-button--danger',
+      }
+    )
+  } catch { return }
+  try {
+    await deleteArticle(row.id)
     ElMessage.success('文章已删除')
-    deleteDialogVisible.value = false
     loadArticles(page.value)
-  } finally {
-    deleting.value = false
+  } catch {
+    /* request.js 全局拦截已弹错 */
   }
 }
 
@@ -314,42 +275,9 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.page-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.page-title {
-  margin: 0 0 4px;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.page-sub {
-  margin: 0;
-  font-size: 13px;
-  color: var(--color-text-tertiary);
-}
-
-.filter-bar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.filter-input { max-width: 240px; }
+.filter-input { width: 220px; }
 .filter-select { width: 130px; }
 .filter-select-sm { width: 110px; }
-
-.article-table { border-radius: var(--radius-lg); overflow: hidden; }
 
 /* 序号 */
 .seq-num { font-size: 12px; color: var(--color-text-tertiary); font-variant-numeric: tabular-nums; }
@@ -476,50 +404,5 @@ onMounted(async () => {
 .act-btn--edit { background: var(--color-bg-secondary); border-color: var(--color-border); color: var(--color-text-secondary); }
 .act-btn--del  { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: var(--color-danger); }
 
-.pagination-wrap {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 12px 0 4px;
-  border-top: 1px solid var(--color-border);
-}
-
-/* 删除弹窗内容 */
-.delete-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 0 8px;
-  text-align: center;
-}
-.delete-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: rgba(239,68,68,.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-}
-.delete-icon { font-size: 26px; color: #EF4444; }
-.delete-msg { margin: 0; font-size: 15px; color: var(--color-text-primary); font-weight: 500; }
-.delete-title-preview {
-  margin: 0;
-  font-size: 14px;
-  color: #E8A838;
-  font-weight: 600;
-  max-width: 320px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.delete-hint { margin: 0; font-size: 12px; color: var(--color-text-tertiary); }
-.delete-footer { display: flex; justify-content: flex-end; gap: 10px; }
-
-:deep(.el-table__row) { height: 68px; }
-:deep(.el-dialog__header) { padding: 16px 20px; }
-:deep(.el-dialog__body) { padding: 20px; }
-:deep(.el-dialog__footer) { padding: 14px 20px; }
+:deep(.data-table .el-table__row) { height: 68px; }
 </style>
