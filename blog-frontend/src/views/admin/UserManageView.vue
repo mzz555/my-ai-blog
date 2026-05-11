@@ -1,27 +1,31 @@
 <template>
-  <div class="page-wrap">
-    <div class="page-head">
-      <div>
-        <h2 class="page-title">用户管理</h2>
-        <p class="page-sub">共 {{ total }} 位用户</p>
-      </div>
-      <div class="head-right">
-        <el-input
-          v-model="keyword"
-          placeholder="搜索用户名 / 昵称"
-          clearable
-          class="search-input"
-          @input="handleSearch"
-        >
-          <template #prefix><el-icon><Search /></el-icon></template>
-        </el-input>
-        <el-button type="primary" @click="openCreate">
-          <el-icon><Plus /></el-icon> 新建用户
-        </el-button>
-      </div>
-    </div>
+  <AdminPageCard title="用户管理" :subtitle="`共 ${total} 位用户`">
+    <template #actions>
+      <el-button type="primary" @click="openCreate">
+        <el-icon><Plus /></el-icon> 新建用户
+      </el-button>
+    </template>
 
-    <el-table :data="users" v-loading="loading" class="data-table">
+    <template #filter>
+      <el-input
+        v-model="keyword"
+        placeholder="搜索用户名 / 昵称"
+        clearable
+        class="search-input"
+        @input="handleSearch"
+      >
+        <template #prefix><el-icon><Search /></el-icon></template>
+      </el-input>
+    </template>
+
+    <DataTable
+      :data="users"
+      :loading="loading"
+      :total="total"
+      :page="page"
+      :page-size="pageSize"
+      @page-change="fetchUsers"
+    >
       <el-table-column prop="id" label="ID" width="60" align="center" />
       <el-table-column label="用户" min-width="160">
         <template #default="{ row }">
@@ -64,18 +68,7 @@
           </div>
         </template>
       </el-table-column>
-    </el-table>
-
-    <div class="pagination-wrap">
-      <el-pagination
-        background
-        layout="total, prev, pager, next"
-        :total="total"
-        :page-size="pageSize"
-        :current-page="page"
-        @current-change="fetchUsers"
-      />
-    </div>
+    </DataTable>
 
     <el-dialog v-model="createVisible" title="新建用户" width="480px" destroy-on-close>
       <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-position="top">
@@ -138,7 +131,7 @@
         </div>
       </template>
     </el-dialog>
-  </div>
+  </AdminPageCard>
 </template>
 
 <script setup>
@@ -147,6 +140,8 @@ import { getUsers, updateUserStatus, updateUser, createUser } from '@/api/user'
 import { getRoles } from '@/api/role'
 import { ElMessage } from 'element-plus'
 import { Search, Edit, Plus } from '@element-plus/icons-vue'
+import AdminPageCard from '@/components/admin/AdminPageCard.vue'
+import DataTable from '@/components/admin/DataTable.vue'
 
 const users = ref([])
 const allRoles = ref([])
@@ -274,19 +269,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-wrap { display: flex; flex-direction: column; gap: 20px; }
-
-.page-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.page-title { margin: 0 0 4px; font-size: 22px; font-weight: 700; color: var(--color-text-primary); }
-.page-sub { margin: 0; font-size: 13px; color: var(--color-text-tertiary); }
 .search-input { width: 220px; }
-.data-table { border-radius: var(--radius-lg); overflow: hidden; }
 
 .user-cell { display: flex; align-items: center; gap: 10px; }
 
@@ -340,20 +323,11 @@ onMounted(async () => {
 .act-btn:hover { opacity: 0.8; }
 .act-btn--edit { background: var(--color-bg-secondary); border-color: var(--color-border); color: var(--color-text-secondary); }
 
-.pagination-wrap {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 12px 0 4px;
-  border-top: 1px solid var(--color-border);
-}
-
 .form-body { display: flex; flex-direction: column; gap: 16px; }
 .form-item { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
 .role-check-group { display: flex; flex-wrap: wrap; gap: 8px; }
 .dialog-footer { display: flex; justify-content: flex-end; gap: 10px; }
 
-:deep(.el-table__row) { height: 60px; }
-.head-right { display: flex; align-items: center; gap: 12px; }
+:deep(.data-table .el-table__row) { height: 60px; }
 </style>
