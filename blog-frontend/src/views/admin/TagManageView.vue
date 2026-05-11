@@ -1,20 +1,17 @@
 <template>
-  <div class="page-wrap">
-    <div class="page-head">
-      <div>
-        <h2 class="page-title">标签管理</h2>
-        <p class="page-sub">共 {{ tags.length }} 个标签</p>
-      </div>
+  <AdminPageCard title="标签管理" :subtitle="`共 ${tags.length} 个标签`">
+    <template #actions>
       <el-button type="primary" @click="openDialog()">
         <el-icon><Plus /></el-icon> 新建标签
       </el-button>
-    </div>
+    </template>
 
-    <!-- 路由标签 -->
-    <div class="route-tabs">
-      <router-link to="/admin/categories" class="rtab">分类管理</router-link>
-      <router-link to="/admin/tags" class="rtab rtab--active">标签管理</router-link>
-    </div>
+    <template #tabs>
+      <div class="route-tabs">
+        <router-link to="/admin/categories" class="rtab">分类管理</router-link>
+        <router-link to="/admin/tags" class="rtab rtab--active">标签管理</router-link>
+      </div>
+    </template>
 
     <div v-if="tags.length" class="tag-grid">
       <div v-for="tag in tags" :key="tag.id" class="tag-card">
@@ -59,7 +56,7 @@
         </div>
       </template>
     </el-dialog>
-  </div>
+  </AdminPageCard>
 </template>
 
 <script setup>
@@ -68,6 +65,7 @@ import { useRouter } from 'vue-router'
 import { getTags, createTag, updateTag, deleteTag } from '@/api/tag'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
+import AdminPageCard from '@/components/admin/AdminPageCard.vue'
 
 const router = useRouter()
 
@@ -122,11 +120,6 @@ onMounted(load)
 </script>
 
 <style scoped>
-.page-wrap { display: flex; flex-direction: column; gap: 20px; }
-.page-head { display: flex; justify-content: space-between; align-items: flex-start; }
-.page-title { margin: 0 0 4px; font-size: 22px; font-weight: 700; color: var(--color-text-primary); }
-.page-sub { margin: 0; font-size: 13px; color: var(--color-text-tertiary); }
-
 .route-tabs { display: flex; border-bottom: 1px solid var(--color-border); }
 .rtab {
   padding: 10px 20px;
