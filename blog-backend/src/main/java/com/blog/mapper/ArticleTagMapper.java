@@ -22,4 +22,18 @@ public interface ArticleTagMapper extends BaseMapper<ArticleTag> {
      */
     @Delete("DELETE FROM article_tags WHERE article_id = #{articleId}")
     void deleteByArticleId(@Param("articleId") Long articleId);
+
+    /**
+     * 批量删除多篇文章的标签关联（用于文章批删除时级联清理）。
+     *
+     * @param articleIds 文章 ID 列表
+     * @return 实际删除的关联行数
+     */
+    @Delete({
+        "<script>",
+        "DELETE FROM article_tags WHERE article_id IN ",
+        "<foreach collection='articleIds' item='aid' open='(' separator=',' close=')'>#{aid}</foreach>",
+        "</script>"
+    })
+    int deleteByArticleIds(@Param("articleIds") java.util.List<Long> articleIds);
 }

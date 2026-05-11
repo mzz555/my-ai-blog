@@ -40,6 +40,14 @@ public interface ArticleService extends IService<Article> {
     void delete(Long id);
 
     /**
+     * 批量删除文章（同时清理 article_tags 关联）。
+     *
+     * @param ids 文章 ID 列表，最多 100 条
+     * @return 实际删除的主表行数（不存在的 id 不计入）
+     */
+    int batchDelete(java.util.List<Long> ids);
+
+    /**
      * 切换文章发布状态（草稿 ↔ 已发布）
      *
      * @param id 文章 ID
