@@ -36,7 +36,7 @@ C 批补齐**批量操作**能力，使后台具备"多选一批 → 一键执�
 ### 3.1 文章批量删除
 
 ```
-POST /api/admin/articles/batch-delete
+POST /api/articles/batch-delete
 Content-Type: application/json
 Authorization: Bearer <token>
 权限：article:delete
@@ -76,7 +76,7 @@ public int batchDelete(List<Long> ids) {
 ### 3.2 评论批量删除
 
 ```
-POST /api/admin/comments/batch-delete
+POST /api/comments/batch-delete
 权限：comment:delete（沿用现有单行 DELETE /api/comments/{id} 的权限注解）
 Body: { "ids": [Long...] }
 Response: { "deleted": N }
@@ -87,7 +87,7 @@ Response: { "deleted": N }
 ### 3.3 评论批量改状态（通过 / 拒绝）
 
 ```
-POST /api/admin/comments/batch-status
+POST /api/comments/batch-status
 权限：comment:approve（沿用现有单行 PUT /api/comments/{id}/status 的权限注解）
 Body:
 {
@@ -241,14 +241,14 @@ async function handleBatchDelete() {
 ```js
 // api/article.js
 export const batchDeleteArticles = (data) =>
-  request.post('/admin/articles/batch-delete', data)
+  request.post('/articles/batch-delete', data)
 
 // api/comment.js
 export const batchDeleteComments = (data) =>
-  request.post('/admin/comments/batch-delete', data)
+  request.post('/comments/batch-delete', data)
 
 export const batchUpdateCommentStatus = (data) =>
-  request.post('/admin/comments/batch-status', data)
+  request.post('/comments/batch-status', data)
 ```
 
 ## 5. UX 流程
