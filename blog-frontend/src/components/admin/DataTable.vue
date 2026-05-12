@@ -1,12 +1,15 @@
 <template>
   <div class="data-table-wrap">
     <el-table
+      ref="tableRef"
       :data="data"
       v-loading="loading"
       :row-key="rowKey"
       class="data-table"
       :empty-text="emptyText"
+      @selection-change="onSelectionChange"
     >
+      <el-table-column v-if="selectable" type="selection" width="48" />
       <slot />
     </el-table>
 
@@ -25,22 +28,35 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 const props = defineProps({
-  data:      { type: Array,   default: () => [] },
-  loading:   { type: Boolean, default: false },
-  total:     { type: Number,  default: 0 },
-  page:      { type: Number,  default: 1 },
-  pageSize:  { type: Number,  default: 10 },
-  rowKey:    { type: String,  default: 'id' },
-  emptyText: { type: String,  default: '暂无数据' },
+  data:       { type: Array,   default: () => [] },
+  loading:    { type: Boolean, default: false },
+  total:      { type: Number,  default: 0 },
+  page:       { type: Number,  default: 1 },
+  pageSize:   { type: Number,  default: 10 },
+  rowKey:     { type: String,  default: 'id' },
+  emptyText:  { type: String,  default: '暂无数据' },
+  selectable: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['update:page', 'page-change'])
+const emit = defineEmits(['update:page', 'page-change', 'selection-change'])
+
+const tableRef = ref(null)
 
 function handlePageChange(p) {
   emit('update:page', p)
   emit('page-change', p)
 }
+
+function onSelectionChange(rows) {
+  emit('selection-change', rows)
+}
+
+defineExpose({
+  clearSelection: () => tableRef.value?.clearSelection(),
+})
 </script>
 
 <style scoped>
