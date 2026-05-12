@@ -93,6 +93,13 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         this.removeById(id);
     }
 
+    @Override
+    @Transactional
+    public int batchDelete(java.util.List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return 0;
+        return this.baseMapper.deleteBatchIds(ids);
+    }
+
     /**
      * 批量填充评论的用户信息，避免 N+1 查询
      *

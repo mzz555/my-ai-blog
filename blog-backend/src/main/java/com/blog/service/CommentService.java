@@ -57,4 +57,12 @@ public interface CommentService extends IService<Comment> {
      * @param id 评论 ID
      */
     void delete(Long id);
+
+    /**
+     * 批量删除评论。
+     *
+     * @param ids 评论 ID 列表
+     * @return 实际删除的行数
+     */
+    int batchDelete(java.util.List<Long> ids);
 }
