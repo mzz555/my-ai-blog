@@ -112,4 +112,16 @@ public class CommentController {
         int deleted = commentService.batchDelete(dto.getIds());
         return Result.success(java.util.Map.of("deleted", deleted));
     }
+
+    /**
+     * 批量改评论审核状态，需要 comment:approve 权限
+     * <p>POST /api/comments/batch-status</p>
+     */
+    @PostMapping("/api/comments/batch-status")
+    @PreAuthorize("hasAuthority('comment:approve')")
+    public Result<java.util.Map<String, Integer>> batchStatus(
+            @Valid @RequestBody com.blog.dto.comment.BatchStatusDTO dto) {
+        int updated = commentService.batchUpdateStatus(dto.getIds(), dto.getStatus());
+        return Result.success(java.util.Map.of("updated", updated));
+    }
 }

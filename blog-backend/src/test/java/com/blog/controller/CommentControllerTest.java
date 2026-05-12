@@ -84,4 +84,70 @@ class CommentControllerTest {
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @WithMockUser(authorities = "comment:approve")
+    void batchStatus_toApproved_shouldReturn200() throws Exception {
+        com.blog.dto.comment.BatchStatusDTO dto = new com.blog.dto.comment.BatchStatusDTO();
+        dto.setIds(Arrays.asList(999_999_999L));
+        dto.setStatus(com.blog.entity.Comment.CommentStatus.APPROVED);
+
+        mockMvc.perform(post("/api/comments/batch-status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.updated").value(0));
+    }
+
+    @Test
+    @WithMockUser(authorities = "comment:approve")
+    void batchStatus_withEmptyIds_shouldReturn400() throws Exception {
+        com.blog.dto.comment.BatchStatusDTO dto = new com.blog.dto.comment.BatchStatusDTO();
+        dto.setIds(Collections.emptyList());
+        dto.setStatus(com.blog.entity.Comment.CommentStatus.APPROVED);
+
+        mockMvc.perform(post("/api/comments/batch-status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(authorities = "comment:approve")
+    void batchStatus_withNullStatus_shouldReturn400() throws Exception {
+        com.blog.dto.comment.BatchStatusDTO dto = new com.blog.dto.comment.BatchStatusDTO();
+        dto.setIds(Arrays.asList(1L));
+        dto.setStatus(null);
+
+        mockMvc.perform(post("/api/comments/batch-status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(authorities = "other:permission")
+    void batchStatus_withoutAuthority_shouldReturn403() throws Exception {
+        com.blog.dto.comment.BatchStatusDTO dto = new com.blog.dto.comment.BatchStatusDTO();
+        dto.setIds(Arrays.asList(1L));
+        dto.setStatus(com.blog.entity.Comment.CommentStatus.APPROVED);
+
+        mockMvc.perform(post("/api/comments/batch-status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void batchStatus_unauthenticated_shouldBeRejected() throws Exception {
+        // 项目 SecurityConfig 未配置 authenticationEntryPoint，Spring Security 6 默认未认证返回 403。
+        com.blog.dto.comment.BatchStatusDTO dto = new com.blog.dto.comment.BatchStatusDTO();
+        dto.setIds(Arrays.asList(1L));
+        dto.setStatus(com.blog.entity.Comment.CommentStatus.APPROVED);
+
+        mockMvc.perform(post("/api/comments/batch-status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isForbidden());
+    }
 }
