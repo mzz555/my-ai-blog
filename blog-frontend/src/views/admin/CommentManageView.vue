@@ -14,13 +14,22 @@
       </div>
     </template>
 
+    <BulkActionBar :count="selectedRows.length" @cancel="clearSelection">
+      <button class="bba-action bba-action--approve" @click="handleBatchApprove">✓ 批量通过</button>
+      <button class="bba-action bba-action--reject" @click="handleBatchReject">✕ 批量拒绝</button>
+      <button class="bba-action bba-action--del" @click="handleBatchDelete">🗑 批量删除</button>
+    </BulkActionBar>
+
     <DataTable
+      ref="dataTableRef"
+      selectable
       :data="comments"
       :loading="loading"
       :total="total"
       :page="page"
       :page-size="pageSize"
       @page-change="load"
+      @selection-change="handleSelectionChange"
     >
 
       <el-table-column type="index" label="#" width="52" align="center" />
@@ -189,11 +198,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getAdminComments, updateCommentStatus, deleteComment } from '@/api/comment'
+import { getAdminComments, updateCommentStatus, deleteComment, batchDeleteComments, batchUpdateCommentStatus } from '@/api/comment'
 import { formatDate } from '@/utils/format'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import AdminPageCard from '@/components/admin/AdminPageCard.vue'
 import DataTable from '@/components/admin/DataTable.vue'
+import BulkActionBar from '@/components/admin/BulkActionBar.vue'
 
 const comments = ref([])
 const loading = ref(false)
@@ -205,6 +215,74 @@ const pendingCount = ref(0)
 const expandedIds = ref(new Set())
 const detailVisible = ref(false)
 const detailRow = ref(null)
+
+const dataTableRef = ref(null)
+const selectedRows = ref([])
+
+function handleSelectionChange(rows) {
+  selectedRows.value = rows
+}
+
+function clearSelection() {
+  dataTableRef.value?.clearSelection()
+}
+
+async function handleBatchApprove() {
+  const ids = selectedRows.value.map(r => r.id)
+  if (!ids.length) return
+  try {
+    await batchUpdateCommentStatus({ ids, status: 'APPROVED' })
+    ElMessage.success(`已通过 ${ids.length} 条评论`)
+    selectedRows.value = []
+    load(page.value)
+    loadPendingCount()
+  } catch { /* 全局拦截 */ }
+}
+
+async function handleBatchReject() {
+  const count = selectedRows.value.length
+  if (count === 0) return
+  try {
+    await ElMessageBox.confirm(
+      `确认将选中的 ${count} 条评论标记为已拒绝？`,
+      '批量拒绝',
+      { type: 'warning', confirmButtonText: '确认拒绝', cancelButtonText: '取消' }
+    )
+  } catch { return }
+  try {
+    const ids = selectedRows.value.map(r => r.id)
+    await batchUpdateCommentStatus({ ids, status: 'REJECTED' })
+    ElMessage.success(`已拒绝 ${count} 条评论`)
+    selectedRows.value = []
+    load(page.value)
+    loadPendingCount()
+  } catch { /* 全局拦截 */ }
+}
+
+async function handleBatchDelete() {
+  const count = selectedRows.value.length
+  if (count === 0) return
+  try {
+    await ElMessageBox.confirm(
+      `确认永久删除选中的 ${count} 条评论？此操作不可撤销。`,
+      '批量删除',
+      {
+        type: 'warning',
+        confirmButtonText: '确认删除',
+        cancelButtonText: '取消',
+        confirmButtonClass: 'el-button--danger',
+      }
+    )
+  } catch { return }
+  try {
+    const ids = selectedRows.value.map(r => r.id)
+    await batchDeleteComments({ ids })
+    ElMessage.success(`已删除 ${count} 条评论`)
+    selectedRows.value = []
+    load(page.value)
+    loadPendingCount()
+  } catch { /* 全局拦截 */ }
+}
 
 const statusTabs = [
   { label: '全部', value: '' },
