@@ -38,13 +38,22 @@
       <el-button v-if="hasFilter" @click="resetFilter">重置</el-button>
     </template>
 
+    <BulkActionBar :count="selectedRows.length" @cancel="clearSelection">
+      <button class="bba-action bba-action--del" @click="handleBatchDelete">
+        <el-icon><Delete /></el-icon> 批量删除
+      </button>
+    </BulkActionBar>
+
     <DataTable
+      ref="dataTableRef"
+      selectable
       :data="articles"
       :loading="loading"
       :total="total"
       :page="page"
       :page-size="pageSize"
       @page-change="loadArticles"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column label="#" width="56" align="center">
         <template #default="{ $index }">
@@ -144,7 +153,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getAdminArticles, deleteArticle, togglePublish } from '@/api/article'
+import { getAdminArticles, deleteArticle, togglePublish, batchDeleteArticles } from '@/api/article'
 import { getCategories } from '@/api/category'
 import { getTags } from '@/api/tag'
 import { formatDate } from '@/utils/format'
@@ -153,6 +162,7 @@ import { Plus, Search, Edit, Delete, Picture } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import AdminPageCard from '@/components/admin/AdminPageCard.vue'
 import DataTable from '@/components/admin/DataTable.vue'
+import BulkActionBar from '@/components/admin/BulkActionBar.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -172,6 +182,43 @@ const tags = ref([])
 const userStore = useUserStore()
 const canToggle = computed(() => userStore.hasPermission('article:publish'))
 const togglingId = ref(null)
+
+const dataTableRef = ref(null)
+const selectedRows = ref([])
+
+function handleSelectionChange(rows) {
+  selectedRows.value = rows
+}
+
+function clearSelection() {
+  dataTableRef.value?.clearSelection()
+}
+
+async function handleBatchDelete() {
+  const count = selectedRows.value.length
+  if (count === 0) return
+  try {
+    await ElMessageBox.confirm(
+      `确认删除选中的 ${count} 篇文章？此操作不可撤销。`,
+      '批量删除确认',
+      {
+        type: 'warning',
+        confirmButtonText: '确认删除',
+        cancelButtonText: '取消',
+        confirmButtonClass: 'el-button--danger',
+      }
+    )
+  } catch { return }
+  try {
+    const ids = selectedRows.value.map(r => r.id)
+    await batchDeleteArticles({ ids })
+    ElMessage.success(`已删除 ${count} 篇文章`)
+    selectedRows.value = []
+    loadArticles(page.value)
+  } catch {
+    /* request.js 全局拦截弹错 */
+  }
+}
 
 const hasFilter = computed(() =>
   keyword.value || categoryFilter.value || tagFilter.value || statusFilter.value
