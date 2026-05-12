@@ -100,4 +100,16 @@ public class CommentController {
         commentService.delete(id);
         return Result.success();
     }
+
+    /**
+     * 批量删除评论，需要 comment:delete 权限
+     * <p>POST /api/comments/batch-delete</p>
+     */
+    @PostMapping("/api/comments/batch-delete")
+    @PreAuthorize("hasAuthority('comment:delete')")
+    public Result<java.util.Map<String, Integer>> batchDelete(
+            @Valid @RequestBody com.blog.dto.common.BatchIdsDTO dto) {
+        int deleted = commentService.batchDelete(dto.getIds());
+        return Result.success(java.util.Map.of("deleted", deleted));
+    }
 }
