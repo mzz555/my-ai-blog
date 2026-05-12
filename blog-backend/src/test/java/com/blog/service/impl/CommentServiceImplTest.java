@@ -37,6 +37,34 @@ class CommentServiceImplTest {
         assertEquals(0, deleted);
     }
 
+    @Test
+    void batchUpdateStatus_toApproved_shouldUpdateAll() {
+        Long id1 = createTestComment();
+        Long id2 = createTestComment();
+
+        int updated = commentService.batchUpdateStatus(
+            Arrays.asList(id1, id2),
+            Comment.CommentStatus.APPROVED
+        );
+
+        assertEquals(2, updated);
+        assertEquals(Comment.CommentStatus.APPROVED, commentMapper.selectById(id1).getStatus());
+        assertEquals(Comment.CommentStatus.APPROVED, commentMapper.selectById(id2).getStatus());
+    }
+
+    @Test
+    void batchUpdateStatus_toRejected_shouldUpdateAll() {
+        Long id1 = createTestComment();
+
+        int updated = commentService.batchUpdateStatus(
+            Arrays.asList(id1),
+            Comment.CommentStatus.REJECTED
+        );
+
+        assertEquals(1, updated);
+        assertEquals(Comment.CommentStatus.REJECTED, commentMapper.selectById(id1).getStatus());
+    }
+
     private Long createTestComment() {
         Comment c = new Comment();
         c.setArticleId(1L);

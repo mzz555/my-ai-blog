@@ -65,4 +65,13 @@ public interface CommentService extends IService<Comment> {
      * @return 实际删除的行数
      */
     int batchDelete(java.util.List<Long> ids);
+
+    /**
+     * 批量改评论状态（仅允许 APPROVED 或 REJECTED）。
+     *
+     * @param ids    评论 ID 列表
+     * @param status 目标状态
+     * @return 实际更新行数
+     */
+    int batchUpdateStatus(java.util.List<Long> ids, CommentStatus status);
 }

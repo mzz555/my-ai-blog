@@ -30,6 +30,22 @@ public interface CommentMapper extends BaseMapper<Comment> {
                                             @Param("status") String status);
 
     /**
+     * 批量更新评论状态。
+     *
+     * @param ids    评论 ID 列表
+     * @param status 目标状态字符串（如 "APPROVED" / "REJECTED"）
+     * @return 实际更新行数
+     */
+    @org.apache.ibatis.annotations.Update({
+        "<script>",
+        "UPDATE comments SET status = #{status} WHERE id IN ",
+        "<foreach collection='ids' item='id' open='(' separator=',' close=')'>#{id}</foreach>",
+        "</script>"
+    })
+    int updateStatusBatch(@Param("ids") java.util.List<Long> ids,
+                          @Param("status") String status);
+
+    /**
      * 按状态统计评论数量（用于仪表盘概览）
      *
      * @param status 状态字符串（如 "PENDING"）
