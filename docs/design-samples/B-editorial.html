@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · The Log — Editorial</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --paper: #FAFAF7;
+  --paper-2: #F1F0EA;
+  --ink: #14110E;
+  --ink-soft: #5C5852;
+  --ink-mute: #908B83;
+  --rule: #D6D2C7;
+  --accent: #963D28;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Nunito Sans", "Noto Sans SC", sans-serif;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.55;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+.masthead {
+  border-bottom: 3px double var(--ink);
+  padding: 22px 64px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.masthead-block .masthead-title {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-style: italic;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.masthead-block .masthead-meta {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-style: italic;
+  letter-spacing: .04em;
+}
+.masthead-nav {
+  display: flex;
+  gap: 28px;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.masthead-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 4px;
+}
+.masthead-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform 250ms ease;
+}
+.masthead-nav a:hover::after { transform: scaleX(1); }
+
+@media (max-width: 768px) {
+  .masthead { padding: 18px 24px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .masthead-nav { gap: 14px; flex-wrap: wrap; }
+}
+
+main { max-width: 1280px; margin: 0 auto; padding: 0 64px; }
+@media (max-width: 768px) { main { padding: 0 24px; } }
+
+.feature {
+  padding: 88px 0 80px;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1fr 1.7fr;
+  gap: 80px;
+  align-items: start;
+}
+@media (max-width: 768px) { .feature { grid-template-columns: 1fr; gap: 40px; padding: 56px 0; } }
+
+.feature-meta {
+  font-size: 11px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+.feature-dek {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--ink-soft);
+  line-height: 1.45;
+  margin-bottom: 32px;
+  max-width: 360px;
+}
+.feature-byline {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--rule);
+  padding-top: 20px;
+  max-width: 320px;
+}
+.feature-readlink {
+  display: inline-block;
+  margin-top: 28px;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-weight: 800;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 4px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+.feature-readlink:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+.feature-headline {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(64px, 11vw, 144px);
+  line-height: .9;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: var(--ink);
+}
+.feature-headline em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent);
+}
+.feature-headline .small {
+  display: block;
+  font-size: .35em;
+  font-style: italic;
+  color: var(--ink-soft);
+  font-weight: 400;
+  margin-top: 14px;
+  letter-spacing: -0.01em;
+}
+
+.three-col {
+  padding: 72px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 56px;
+  border-bottom: 1px solid var(--rule);
+}
+@media (max-width: 768px) { .three-col { grid-template-columns: 1fr; gap: 48px; padding: 48px 0; } }
+
+.section-title {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 32px;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ink);
+  letter-spacing: -0.015em;
+}
+
+.story { margin-bottom: 32px; cursor: pointer; }
+.story-byline {
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.story-headline {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.18;
+  letter-spacing: -0.013em;
+  margin-bottom: 8px;
+  transition: color 200ms ease;
+}
+.story:hover .story-headline { color: var(--accent); }
+.story-dek {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.opinion {
+  padding: 80px 0;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 80px;
+  border-bottom: 1px solid var(--rule);
+}
+@media (max-width: 768px) { .opinion { grid-template-columns: 1fr; gap: 36px; padding: 56px 0; } }
+.opinion-body {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 21px;
+  line-height: 1.55;
+  color: var(--ink);
+  font-style: italic;
+}
+.opinion-body::first-letter {
+  float: left;
+  font-size: 86px;
+  line-height: .82;
+  font-weight: 500;
+  margin: 6px 12px -2px 0;
+  color: var(--accent);
+  font-style: normal;
+}
+.opinion-aside {
+  border-left: 1px solid var(--rule);
+  padding-left: 32px;
+  font-family: "Cormorant Garamond", serif;
+}
+.opinion-aside h3 {
+  font-style: italic;
+  font-size: 20px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ink);
+  font-weight: 500;
+}
+.opinion-aside ul { list-style: none; }
+.opinion-aside li {
+  padding: 10px 0;
+  border-bottom: 1px dotted var(--rule);
+  font-size: 15px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.opinion-aside li::before { content: "▸ "; color: var(--accent); }
+
+footer.site {
+  padding: 50px 64px;
+  border-top: 3px double var(--ink);
+  display: flex;
+  justify-content: space-between;
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+@media (max-width: 768px) { footer.site { padding: 36px 24px; flex-direction: column; gap: 6px; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-block">
+    <div class="masthead-title">The Log</div>
+    <div class="masthead-meta">A field journal on systems · Vol. XII · June MMXXVI</div>
+  </div>
+  <nav class="masthead-nav">
+    <a href="#">Essays</a>
+    <a href="#">Notes</a>
+    <a href="#">Code</a>
+    <a href="#">Archive</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<main>
+
+<article class="feature">
+  <aside>
+    <div class="feature-meta">Feature — Essay</div>
+    <p class="feature-dek">Some refactors are not surgery; they are ten iterations of careful return.</p>
+    <p class="feature-byline">By <strong>憨憨</strong>, written from a basement office in late spring of 2026 — fourteen minutes to read.</p>
+    <a href="#" class="feature-readlink">Read in full →</a>
+  </aside>
+  <div>
+    <h1 class="feature-headline">On the<br><em>quiet</em><br>refactor.<span class="small">— and what we owe the code we did not write.</span></h1>
+  </div>
+</article>
+
+<section class="three-col">
+  <div>
+    <h2 class="section-title">Essays</h2>
+    <article class="story">
+      <div class="story-byline">14 min · June 09</div>
+      <h3 class="story-headline">TDD as a control loop</h3>
+      <p class="story-dek">Why writing the test first is, in fact, the cheapest form of negotiation with future-you.</p>
+    </article>
+    <article class="story">
+      <div class="story-byline">9 min · June 04</div>
+      <h3 class="story-headline">The hidden costs of caching</h3>
+      <p class="story-dek">A small story about a small mistake that scaled badly.</p>
+    </article>
+  </div>
+
+  <div>
+    <h2 class="section-title">Notes</h2>
+    <article class="story">
+      <div class="story-byline">5 min · May 28</div>
+      <h3 class="story-headline">MyBatis-Plus, and where it stops being kind</h3>
+      <p class="story-dek">The line between productivity and surrender.</p>
+    </article>
+    <article class="story">
+      <div class="story-byline">3 min · May 21</div>
+      <h3 class="story-headline">An index is a deferred promise</h3>
+      <p class="story-dek">On databases that grow up with you.</p>
+    </article>
+  </div>
+
+  <div>
+    <h2 class="section-title">Code</h2>
+    <article class="story">
+      <div class="story-byline">11 min · May 14</div>
+      <h3 class="story-headline">Vue composables and the cost of clarity</h3>
+      <p class="story-dek">A short defense of writing one more file.</p>
+    </article>
+    <article class="story">
+      <div class="story-byline">7 min · April 30</div>
+      <h3 class="story-headline">Half-finished thoughts on DDD</h3>
+      <p class="story-dek">If a domain has no oral tradition, does it exist?</p>
+    </article>
+  </div>
+</section>
+
+<section class="opinion">
+  <div class="opinion-body">
+    每一個系統都有它不願被翻譯的部分。當你終於要動它的時候，會發現那部分恰好是它的脾氣，不是它的功能。<br><br>
+    這是這一期想記下的事：怎麼在不傷脾氣的前提下，繼續把它馴服。
+  </div>
+  <aside class="opinion-aside">
+    <h3>In this issue</h3>
+    <ul>
+      <li>On slow refactors</li>
+      <li>The economy of a test</li>
+      <li>Where ORMs lie</li>
+      <li>An evening with Vue</li>
+      <li>Three SQL traps</li>
+      <li>Closing notes</li>
+    </ul>
+  </aside>
+</section>
+
+</main>
+
+<footer class="site">
+  <span>Set in Cormorant Garamond &amp; Nunito Sans.</span>
+  <span>Printed (digitally) in Beijing — © MMXXVI</span>
+</footer>
+
+</body>
+</html>

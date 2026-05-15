@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C · HANHAN/NOTES — Brutalist</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0a0a0a;
+  --fg: #f3f3ed;
+  --fg-dim: #8a8a82;
+  --hot: #d6ff3a;
+  --line: #2b2b27;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); }
+body {
+  font-family: "JetBrains Mono", monospace;
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 400;
+  letter-spacing: -.005em;
+  cursor: default;
+  min-height: 100vh;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  background-image: repeating-linear-gradient(
+    0deg, transparent 0, transparent 2px,
+    rgba(255,255,255,.01) 2px, rgba(255,255,255,.01) 3px);
+}
+
+main { max-width: 920px; margin: 0 auto; padding: 32px 28px 80px; }
+
+.hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  margin-bottom: 36px;
+  border-bottom: 1px dashed var(--fg);
+}
+.hdr-brand {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+.hdr-brand .hot { color: var(--hot); }
+.hdr-meta {
+  font-size: 11px;
+  color: var(--fg-dim);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.hdr-meta button {
+  background: transparent;
+  border: 1px solid var(--fg-dim);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 10px;
+  padding: 4px 10px;
+  cursor: pointer;
+  letter-spacing: .1em;
+  transition: all 150ms;
+}
+.hdr-meta button:hover { border-color: var(--hot); color: var(--hot); background: rgba(214,255,58,.05); }
+
+.hero {
+  padding: 56px 0 64px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 36px;
+}
+.hero-tag {
+  font-size: 11px;
+  color: var(--hot);
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.hero-title {
+  font-size: clamp(28px, 5.5vw, 60px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: lowercase;
+  margin-bottom: 22px;
+}
+.hero-title::before { content: "$ "; color: var(--hot); }
+.hero-title .cursor {
+  display: inline-block;
+  width: .55em;
+  height: .9em;
+  background: var(--hot);
+  vertical-align: text-top;
+  margin-left: 4px;
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink { 50% { background: transparent; } }
+.hero-sub {
+  font-size: 13px;
+  color: var(--fg-dim);
+  max-width: 560px;
+}
+.hero-sub::before { content: "// "; color: var(--hot); }
+
+.featured-ascii {
+  margin: 0 0 36px;
+  padding: 32px 28px;
+  border: 1px solid var(--fg);
+  position: relative;
+  background: linear-gradient(135deg, rgba(214,255,58,.04) 0%, transparent 60%);
+}
+.featured-ascii::before {
+  content: "// FEATURED ////////////////////////////";
+  position: absolute;
+  top: -7px;
+  left: 16px;
+  background: var(--bg);
+  padding: 0 8px;
+  font-size: 10px;
+  color: var(--hot);
+  letter-spacing: .15em;
+}
+.featured-ascii pre {
+  font-family: inherit;
+  white-space: pre;
+  font-size: 11px;
+  color: var(--fg-dim);
+  margin-bottom: 20px;
+  line-height: 1.3;
+}
+.featured-ascii .ft-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: 12px;
+  text-transform: lowercase;
+}
+.featured-ascii .ft-dek {
+  font-size: 13px;
+  color: var(--fg-dim);
+  max-width: 540px;
+  margin-bottom: 22px;
+}
+.featured-ascii .ft-read {
+  color: var(--hot);
+  font-size: 12px;
+  letter-spacing: .1em;
+  text-decoration: none;
+  font-weight: 600;
+}
+.featured-ascii .ft-read:hover {
+  background: var(--hot);
+  color: var(--bg);
+  padding: 2px 6px;
+}
+
+.post {
+  padding: 26px 0 22px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 28px;
+  align-items: start;
+  transition: all 200ms ease;
+}
+.post:hover {
+  background: rgba(214,255,58,.04);
+  padding-left: 12px;
+}
+.post:hover .post-num { color: var(--hot); }
+.post:hover .post-arrow { color: var(--hot); transform: translateX(4px); }
+.post-num {
+  font-size: 12px;
+  color: var(--fg-dim);
+  letter-spacing: .05em;
+  white-space: nowrap;
+  transition: color 200ms ease;
+}
+.post-body { min-width: 0; }
+.post-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  margin-bottom: 6px;
+  text-transform: lowercase;
+}
+.post-dek {
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin-bottom: 12px;
+  line-height: 1.55;
+  max-width: 580px;
+}
+.post-meta {
+  font-size: 10px;
+  color: var(--fg-dim);
+  letter-spacing: .08em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.post-meta .tag {
+  display: inline-block;
+  border: 1px solid var(--line);
+  padding: 1px 7px;
+  font-size: 10px;
+}
+.post-arrow {
+  margin-left: auto;
+  color: var(--fg-dim);
+  transition: all 200ms ease;
+}
+
+.tag-bar {
+  margin-top: 56px;
+  padding: 22px 0 0;
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+.tag-bar > span { color: var(--hot); margin-right: 10px; }
+.tag-bar a {
+  color: var(--fg-dim);
+  text-decoration: none;
+  margin-right: 10px;
+  border-bottom: 1px dashed transparent;
+  transition: all 150ms;
+}
+.tag-bar a:hover { color: var(--fg); border-bottom-color: var(--hot); }
+.foot {
+  margin-top: 48px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--fg-dim);
+  font-size: 10px;
+  color: var(--fg-dim);
+  letter-spacing: .1em;
+  display: flex;
+  justify-content: space-between;
+}
+.foot .hot { color: var(--hot); }
+</style>
+</head>
+<body>
+
+<main>
+
+<header class="hdr">
+  <div class="hdr-brand">HANHAN<span class="hot">/</span>NOTES</div>
+  <div class="hdr-meta">
+    <span>v0.12.0 · build 2026.06.12</span>
+    <button>[LIGHT]</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">>>> log entry #001</div>
+  <h1 class="hero-title">notes on the slow refactor<span class="cursor"></span></h1>
+  <p class="hero-sub">一個記錄系統、思考、和那些不該被改一遍就完事的代碼的日誌。</p>
+</section>
+
+<article class="featured-ascii">
+<pre>┌────────────────────────────────┐
+│ id      : 001                  │
+│ date    : 2026-06-12           │
+│ reading : 14 minutes           │
+│ status  : published            │
+└────────────────────────────────┘</pre>
+  <h2 class="ft-title">refactor as deceleration</h2>
+  <p class="ft-dek">on the slow re-architecture of a codebase you can't rewrite — and what you give up when you try. some refactors are not cuts, they are ten iterations of careful return.</p>
+  <a href="#" class="ft-read">> READ ━━━━━━━━━━━━━━━━━━━━━━━━━━▶</a>
+</article>
+
+<div class="post">
+  <div class="post-num">#002 / 06.09</div>
+  <div class="post-body">
+    <div class="post-title">tdd is a control loop</div>
+    <div class="post-dek">why the cheapest form of negotiation is the test you wrote yesterday.</div>
+    <div class="post-meta"><span class="tag">testing</span><span class="tag">loops</span><span style="margin-left:auto">7m</span><span class="post-arrow">▶</span></div>
+  </div>
+</div>
+
+<div class="post">
+  <div class="post-num">#003 / 06.04</div>
+  <div class="post-body">
+    <div class="post-title">mybatis-plus and the kind of help that hurts</div>
+    <div class="post-dek">a small treatise on the line between productivity and surrender.</div>
+    <div class="post-meta"><span class="tag">java</span><span class="tag">orm</span><span style="margin-left:auto">9m</span><span class="post-arrow">▶</span></div>
+  </div>
+</div>
+
+<div class="post">
+  <div class="post-num">#004 / 05.28</div>
+  <div class="post-body">
+    <div class="post-title">vue composables and the cost of clarity</div>
+    <div class="post-dek">in defense of writing one more file.</div>
+    <div class="post-meta"><span class="tag">vue</span><span class="tag">style</span><span style="margin-left:auto">11m</span><span class="post-arrow">▶</span></div>
+  </div>
+</div>
+
+<div class="post">
+  <div class="post-num">#005 / 05.21</div>
+  <div class="post-body">
+    <div class="post-title">an index is a deferred promise</div>
+    <div class="post-dek">on databases that grow up with you, and the bills they hand you in year three.</div>
+    <div class="post-meta"><span class="tag">sql</span><span class="tag">perf</span><span style="margin-left:auto">5m</span><span class="post-arrow">▶</span></div>
+  </div>
+</div>
+
+<nav class="tag-bar">
+  <span>[ tags ]</span>
+  <a href="#">java</a><a href="#">spring</a><a href="#">vue</a><a href="#">sql</a><a href="#">ddd</a><a href="#">orm</a><a href="#">perf</a><a href="#">testing</a><a href="#">arch</a>
+</nav>
+
+<footer class="foot">
+  <span class="hot">// END OF FEED</span>
+  <span>NO COOKIES · NO ANALYTICS · NO BULLSHIT</span>
+</footer>
+
+</main>
+
+</body>
+</html>

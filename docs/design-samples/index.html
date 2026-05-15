@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>前端样张 · 4 个方向</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: #fafafa;
+  color: #111;
+  padding: 60px 40px;
+  min-height: 100vh;
+}
+.wrap { max-width: 1080px; margin: 0 auto; }
+header { margin-bottom: 48px; }
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin-bottom: 12px;
+}
+header p {
+  color: #666;
+  font-size: 15px;
+  max-width: 580px;
+  line-height: 1.6;
+}
+header .hint {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: #999;
+  margin-top: 14px;
+  letter-spacing: .04em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+@media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 28px;
+  background: #fff;
+  transition: all 200ms ease;
+  position: relative;
+  overflow: hidden;
+}
+.card:hover {
+  border-color: #111;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -16px rgba(0,0,0,.18);
+}
+.card-tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  color: #999;
+  margin-bottom: 18px;
+}
+.card-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.015em;
+  margin-bottom: 10px;
+}
+.card-dek {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+.card-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: #999;
+  letter-spacing: .04em;
+  border-top: 1px solid #eee;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.card-meta b { color: #333; font-weight: 600; }
+
+.card-a .swatch { background: #E8A838; }
+.card-b .swatch { background: #963D28; }
+.card-c { background: #0a0a0a; color: #f3f3ed; border-color: #2b2b27; }
+.card-c .card-tag { color: #d6ff3a; }
+.card-c .card-dek { color: #b0b0a8; }
+.card-c .card-meta { border-top-color: #2b2b27; color: #8a8a82; }
+.card-c .card-meta b { color: #f3f3ed; }
+.card-c .swatch { background: #d6ff3a; }
+.card-d { background: linear-gradient(135deg, #0a0a16 0%, #1a1030 100%); color: #e0e0ff; border-color: rgba(255,45,117,.3); }
+.card-d .card-tag { color: #2cf0ff; }
+.card-d .card-dek { color: #aaaad0; }
+.card-d .card-meta { border-top-color: rgba(255,255,255,.1); color: #8a8aaf; }
+.card-d .card-meta b { color: #e0e0ff; }
+.card-d .swatch { background: linear-gradient(90deg, #ff2d75 0%, #2cf0ff 100%); }
+
+.swatch {
+  width: 36px; height: 4px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+footer { margin-top: 56px; font-family: "JetBrains Mono", monospace; font-size: 11px; color: #999; letter-spacing: .04em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>前端样张 · 4 个方向</h1>
+  <p>每个是一份完整的首页样张，独立的 HTML 文件（用 Google Fonts CDN，首次加载需联网）。点卡片打开实际效果对比。</p>
+  <p class="hint">// 风格定下来后，会以此为蓝本改 blog-frontend 的 tokens.css + views/front/*.vue</p>
+</header>
+
+<div class="grid">
+
+<a class="card card-a" href="A-soft-modern.html">
+  <div class="swatch"></div>
+  <div class="card-tag">A · WARM · REFINED</div>
+  <div class="card-title">Soft Modern 演化</div>
+  <p class="card-dek">在现有米色 + 琥珀金底子上加 serif 标题（Fraunces 可变字体）+ 微动入场 + 极柔阴影。最不伤现有资产、最易回滚。</p>
+  <div class="card-meta">
+    <span><b>字体</b> Fraunces / Source Serif 4 / JetBrains Mono</span>
+    <span><b>调性</b> 温暖 · 可读 · 东亚杂志感</span>
+    <span><b>风险</b> 低</span>
+  </div>
+</a>
+
+<a class="card card-b" href="B-editorial.html">
+  <div class="swatch"></div>
+  <div class="card-tag">B · EDITORIAL · TYPOGRAPHIC</div>
+  <div class="card-title">The Log · 杂志</div>
+  <p class="card-dek">象 monocle / NYT magazine 的版面：超大 serif 标题（Cormorant Garamond）+ 三栏 + drop-cap + 双线分隔。当作一份"印刷物"做。</p>
+  <div class="card-meta">
+    <span><b>字体</b> Cormorant Garamond / Nunito Sans</span>
+    <span><b>调性</b> 严肃 · 文文 · 可读性拉满</span>
+    <span><b>风险</b> 中（与现有 admin 视觉脱节较大）</span>
+  </div>
+</a>
+
+<a class="card card-c" href="C-brutalist.html">
+  <div class="swatch"></div>
+  <div class="card-tag">C · BRUTALIST · MONO</div>
+  <div class="card-title">HANHAN/NOTES</div>
+  <p class="card-dek">全 JetBrains Mono + 纯黑底 + 荧光绿一重点色 + ASCII 边框装饰。一眼"这人写代码"，但访客面会偏窄。</p>
+  <div class="card-meta">
+    <span><b>字体</b> JetBrains Mono (全员)</span>
+    <span><b>调性</b> 刚硬 · 玩心 · 圈内人共鸣强</span>
+    <span><b>风险</b> 中（非技术读者会觉得"看不进去"）</span>
+  </div>
+</a>
+
+<a class="card card-d" href="D-retro-crt.html">
+  <div class="swatch"></div>
+  <div class="card-tag">D · RETRO · CRT</div>
+  <div class="card-title">ANALOG.LOG</div>
+  <p class="card-dek">深底 + 洋红 / 青双重点色 + VT323 像素字 + CRT 扫描线 + flicker。氛围极强、记忆点最大，但长文阅读时可能眼累。</p>
+  <div class="card-meta">
+    <span><b>字体</b> VT323 / JetBrains Mono</span>
+    <span><b>调性</b> 复古 · 炫身 · "氛围博客"路线</span>
+    <span><b>风险</b> 高（不适合密集长文）</span>
+  </div>
+</a>
+
+</div>
+
+<footer>// 在浏览器双击任一 .html 文件即可打开 / 也可直接打开本 index.html</footer>
+
+</div>
+</body>
+</html>
