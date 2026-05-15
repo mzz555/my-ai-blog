@@ -74,15 +74,13 @@ class CommentControllerTest {
     }
 
     @Test
-    void batchDelete_unauthenticated_shouldBeRejected() throws Exception {
-        // 项目 SecurityConfig 未配置 authenticationEntryPoint，Spring Security 6 默认对未认证请求
-        // 返回 403 Forbidden 而非 401 Unauthorized。本测试断言"被拒绝"的语义。
+    void batchDelete_unauthenticated_shouldReturn401() throws Exception {
         BatchIdsDTO dto = new BatchIdsDTO();
         dto.setIds(Arrays.asList(1L));
         mockMvc.perform(post("/api/comments/batch-delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -139,8 +137,7 @@ class CommentControllerTest {
     }
 
     @Test
-    void batchStatus_unauthenticated_shouldBeRejected() throws Exception {
-        // 项目 SecurityConfig 未配置 authenticationEntryPoint，Spring Security 6 默认未认证返回 403。
+    void batchStatus_unauthenticated_shouldReturn401() throws Exception {
         com.blog.dto.comment.BatchStatusDTO dto = new com.blog.dto.comment.BatchStatusDTO();
         dto.setIds(Arrays.asList(1L));
         dto.setStatus(com.blog.entity.Comment.CommentStatus.APPROVED);
@@ -148,6 +145,6 @@ class CommentControllerTest {
         mockMvc.perform(post("/api/comments/batch-status")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }

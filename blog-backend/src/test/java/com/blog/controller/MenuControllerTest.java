@@ -46,9 +46,9 @@ class MenuControllerTest {
     }
 
     @Test
-    void listMenus_withoutToken_shouldReturn403() throws Exception {
+    void listMenus_withoutToken_shouldReturn401() throws Exception {
         mockMvc.perform(get("/api/admin/menus"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
