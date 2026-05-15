@@ -74,15 +74,12 @@ class ArticleControllerTest {
     }
 
     @Test
-    void batchDelete_unauthenticated_shouldBeRejected() throws Exception {
-        // 项目 SecurityConfig 未配置 authenticationEntryPoint，Spring Security 6 默认对未认证请求
-        // 返回 403 Forbidden 而非 401 Unauthorized。本测试断言"被拒绝"的语义（403），
-        // 401 行为修正属于全局安全配置改动，应在独立 task 中处理。
+    void batchDelete_unauthenticated_shouldReturn401() throws Exception {
         BatchIdsDTO dto = new BatchIdsDTO();
         dto.setIds(Arrays.asList(1L));
         mockMvc.perform(post("/api/articles/batch-delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }
