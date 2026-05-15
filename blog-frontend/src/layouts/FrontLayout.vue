@@ -106,6 +106,9 @@ function doSearch() {
   display: flex;
   flex-direction: column;
   background-color: var(--color-bg);
+  background-image: var(--bg-glow-1), var(--bg-glow-2);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 .header {
@@ -132,11 +135,13 @@ function doSearch() {
 }
 
 .brand {
-  font-size: 24px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 100, "wght" 600, "SOFT" 50;
+  font-size: 26px;
+  font-weight: 600;
   color: var(--color-accent);
   text-decoration: none;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.015em;
   flex-shrink: 0;
   transition: opacity var(--transition-fast);
 }
@@ -256,10 +261,13 @@ function doSearch() {
 }
 .footer-brand { width: 280px; display: flex; flex-direction: column; gap: 14px; }
 .footer-logo {
-  font-size: 20px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 100, "wght" 600, "SOFT" 50;
+  font-size: 22px;
+  font-weight: 600;
   color: #E8A838;
   text-decoration: none;
+  letter-spacing: -0.012em;
 }
 .footer-brand-desc { margin: 0; font-size: 13px; color: var(--color-text-tertiary); line-height: 1.7; }
 .footer-col { display: flex; flex-direction: column; gap: 14px; width: 160px; }
