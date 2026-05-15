@@ -15,6 +15,10 @@
         </span>
       </div>
     </div>
+    <div class="card-read-hint">
+      <span>阅读</span>
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
   </article>
 </template>
 
@@ -70,10 +74,13 @@ const accentColor = computed(() => {
 
 .card-title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 36, "wght" 500, "SOFT" 50;
+  font-size: 19px;
+  font-weight: 500;
   color: var(--color-text-primary);
-  line-height: 1.45;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -98,11 +105,35 @@ const accentColor = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
   color: var(--color-text-tertiary);
-  padding-top: 8px;
+  letter-spacing: .02em;
+  padding-top: 10px;
   border-top: 1px solid var(--color-border);
 }
 
 .meta-views { display: flex; align-items: center; gap: 3px; }
+
+.grid-card { position: relative; }
+.card-read-hint {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--color-accent);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 200ms ease, transform 200ms ease;
+  pointer-events: none;
+}
+.grid-card:hover .card-read-hint {
+  opacity: 1;
+  transform: translateX(0);
+}
 </style>
