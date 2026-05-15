@@ -105,10 +105,13 @@ defineProps({ article: Object })
 
 .title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 36, "wght" 500, "SOFT" 50;
+  font-size: 19px;
+  font-weight: 500;
   color: var(--color-text-primary);
-  line-height: 1.45;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -132,16 +135,18 @@ defineProps({ article: Object })
 .meta-bottom {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  letter-spacing: .02em;
 }
 
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: 5px;
+  font-size: 11px;
   color: var(--color-text-tertiary);
 }
 
