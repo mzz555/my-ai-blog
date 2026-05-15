@@ -34,13 +34,14 @@
         </div>
       </div>
     </section>
-    <div class="section-divider"></div>
+    <div class="section-divider">
+      <span>最近的字</span>
+    </div>
 
     <!-- 最新文章 -->
     <section class="articles-section">
       <div class="section-inner">
         <div class="section-header">
-          <h2 class="section-title">最新文章</h2>
           <router-link to="/posts" class="section-link">
             查看全部
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -62,7 +63,9 @@
         <el-empty v-else description="暂无文章" />
       </div>
     </section>
-    <div class="section-divider"></div>
+    <div class="section-divider">
+      <span>· · ·</span>
+    </div>
 
     <!-- Newsletter -->
     <section class="newsletter-section">
@@ -312,7 +315,31 @@ onMounted(loadArticles)
 .hero-cover-placeholder svg { opacity: 0.25; color: #6E6E82; }
 
 /* Divider */
-.section-divider { height: 1px; background: var(--color-border); }
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 64px;
+  position: relative;
+  height: 56px;
+}
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 0;
+  border-top: 1px dashed var(--color-border);
+}
+.section-divider span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
 
 /* Articles */
 .articles-section { width: 100%; }
@@ -325,7 +352,7 @@ onMounted(loadArticles)
   gap: 32px;
 }
 
-.section-header { display: flex; justify-content: space-between; align-items: center; }
+.section-header { display: flex; justify-content: flex-end; align-items: center; }
 .section-title {
   margin: 0;
   font-family: var(--font-display);
