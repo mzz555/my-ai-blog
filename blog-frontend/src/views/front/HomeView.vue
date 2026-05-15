@@ -4,6 +4,7 @@
     <section v-if="featured" class="hero">
       <div class="hero-inner">
         <div class="hero-left">
+          <div class="hero-kicker">— 最新一期 / {{ formatKickerDate(featured.publishedAt) }}</div>
           <div class="hero-tag-row">
             <span class="hero-badge">{{ featured.categoryName || '技术' }}</span>
             <span v-if="featured.isTop" class="hero-badge hero-badge-top">置顶</span>
@@ -33,13 +34,14 @@
         </div>
       </div>
     </section>
-    <div class="section-divider"></div>
+    <div class="section-divider">
+      <span>最近的字</span>
+    </div>
 
     <!-- 最新文章 -->
     <section class="articles-section">
       <div class="section-inner">
         <div class="section-header">
-          <h2 class="section-title">最新文章</h2>
           <router-link to="/posts" class="section-link">
             查看全部
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -61,7 +63,9 @@
         <el-empty v-else description="暂无文章" />
       </div>
     </section>
-    <div class="section-divider"></div>
+    <div class="section-divider">
+      <span>· · ·</span>
+    </div>
 
     <!-- Newsletter -->
     <section class="newsletter-section">
@@ -126,6 +130,13 @@ async function subscribeNewsletter() {
   }
 }
 
+function formatKickerDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  return `${months[d.getMonth()]} ${d.getFullYear()}`
+}
+
 onMounted(loadArticles)
 </script>
 
@@ -184,13 +195,48 @@ onMounted(loadArticles)
 
 .hero-title {
   margin: 0;
-  font-size: 50px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 144, "wght" 400, "SOFT" 30, "WONK" 1;
+  font-size: clamp(40px, 6.5vw, 72px);
+  font-weight: 400;
+  line-height: 1.05;
   color: #F0F0F8;
-  letter-spacing: -1px;
+  letter-spacing: -0.025em;
 }
 :root:not([data-theme='dark']) .hero-title { color: #111827; }
+
+.hero-kicker {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-variation-settings: "opsz" 14, "wght" 400;
+  font-size: 14px;
+  color: var(--color-accent);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-kicker,
+.hero-tag-row,
+.hero-title,
+.hero-desc,
+.hero-meta,
+.hero-btns,
+.hero-right {
+  opacity: 0;
+  animation: hero-fade-up .8s ease forwards;
+}
+.hero-kicker  { animation-delay: 0.05s; }
+.hero-tag-row { animation-delay: 0.15s; }
+.hero-title   { animation-delay: 0.25s; }
+.hero-desc    { animation-delay: 0.40s; }
+.hero-meta    { animation-delay: 0.55s; }
+.hero-btns    { animation-delay: 0.70s; }
+.hero-right   { animation-delay: 0.30s; }
 
 .hero-desc {
   margin: 0;
@@ -202,8 +248,21 @@ onMounted(loadArticles)
 :root:not([data-theme='dark']) .hero-desc { color: #6B7280; }
 
 .hero-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-.hero-meta-item { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #6E6E82; }
-.hero-tag { font-size: 13px; color: #E8A838; }
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #6E6E82;
+  letter-spacing: 0;
+}
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #E8A838;
+  letter-spacing: 0;
+}
 
 .hero-btns { display: flex; gap: 14px; }
 
@@ -256,7 +315,31 @@ onMounted(loadArticles)
 .hero-cover-placeholder svg { opacity: 0.25; color: #6E6E82; }
 
 /* Divider */
-.section-divider { height: 1px; background: var(--color-border); }
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 64px;
+  position: relative;
+  height: 56px;
+}
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 0;
+  border-top: 1px dashed var(--color-border);
+}
+.section-divider span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
 
 /* Articles */
 .articles-section { width: 100%; }
@@ -269,8 +352,16 @@ onMounted(loadArticles)
   gap: 32px;
 }
 
-.section-header { display: flex; justify-content: space-between; align-items: center; }
-.section-title { margin: 0; font-size: 24px; font-weight: 700; color: var(--color-text-primary); }
+.section-header { display: flex; justify-content: flex-end; align-items: center; }
+.section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 60, "wght" 500, "SOFT" 50;
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
 
 .section-link {
   display: flex;
@@ -322,10 +413,13 @@ onMounted(loadArticles)
 
 .newsletter-title {
   margin: 0;
-  font-size: 30px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 100, "wght" 500, "SOFT" 50;
+  font-size: 38px;
+  font-weight: 500;
   color: #F0F0F8;
   text-align: center;
+  letter-spacing: -0.02em;
 }
 :root:not([data-theme='dark']) .newsletter-title { color: #111827; }
 
