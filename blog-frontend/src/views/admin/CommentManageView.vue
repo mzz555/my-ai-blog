@@ -224,6 +224,7 @@ function handleSelectionChange(rows) {
 }
 
 function clearSelection() {
+  selectedRows.value = []
   dataTableRef.value?.clearSelection()
 }
 
@@ -294,6 +295,7 @@ const statusTabs = [
 async function load(p = 1) {
   loading.value = true
   page.value = p
+  clearSelection()
   try {
     const params = { page: p, size: pageSize }
     if (statusFilter.value) params.status = statusFilter.value

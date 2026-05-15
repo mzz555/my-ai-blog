@@ -15,7 +15,7 @@
 
 <script setup>
 defineProps({
-  count: { type: Number, required: true, default: 0 },
+  count: { type: Number, required: true },
 })
 
 defineEmits(['cancel'])

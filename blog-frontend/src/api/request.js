@@ -49,12 +49,14 @@ request.interceptors.response.use(
         } catch {
           clearAuth()
           router.push('/login')
+          return Promise.reject(error)
         } finally {
           isRefreshing = false
         }
       } else {
         clearAuth()
         router.push('/login')
+        return Promise.reject(error)
       }
     }
 
