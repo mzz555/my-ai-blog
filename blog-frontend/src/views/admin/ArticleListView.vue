@@ -191,6 +191,7 @@ function handleSelectionChange(rows) {
 }
 
 function clearSelection() {
+  selectedRows.value = []
   dataTableRef.value?.clearSelection()
 }
 
@@ -227,6 +228,7 @@ const hasFilter = computed(() =>
 async function loadArticles(p = 1) {
   loading.value = true
   page.value = p
+  clearSelection()
   try {
     const params = { page: p, size: pageSize }
     if (keyword.value.trim()) params.keyword = keyword.value.trim()

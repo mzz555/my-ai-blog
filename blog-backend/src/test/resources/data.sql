@@ -29,8 +29,15 @@ INSERT INTO menus (name, code, type, sort_order) VALUES
 ('角色管理',   'role:manage',     'BUTTON', 12),
 ('菜单管理',   'menu:manage',     'BUTTON', 13);
 
--- ADMIN role gets all permissions
-INSERT INTO role_menus (role_id, menu_id) SELECT 1, id FROM menus;
+-- ADMIN role gets all standard permissions（按 code 白名单过滤，
+-- 避免其他测试残留菜单被自动授予 ADMIN）
+INSERT INTO role_menus (role_id, menu_id)
+SELECT 1, id FROM menus
+WHERE code IN (
+  'article:list','article:create','article:update','article:delete','article:publish',
+  'comment:list','comment:approve','comment:delete',
+  'category:manage','tag:manage','user:list','role:manage','menu:manage'
+);
 
 -- Admin user: admin / Admin@2024  (BCrypt hash)
 INSERT IGNORE INTO users (id, username, email, password, status) VALUES
