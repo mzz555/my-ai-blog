@@ -202,8 +202,21 @@ onMounted(loadArticles)
 :root:not([data-theme='dark']) .hero-desc { color: #6B7280; }
 
 .hero-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-.hero-meta-item { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #6E6E82; }
-.hero-tag { font-size: 13px; color: #E8A838; }
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #6E6E82;
+  letter-spacing: 0;
+}
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #E8A838;
+  letter-spacing: 0;
+}
 
 .hero-btns { display: flex; gap: 14px; }
 
@@ -270,7 +283,15 @@ onMounted(loadArticles)
 }
 
 .section-header { display: flex; justify-content: space-between; align-items: center; }
-.section-title { margin: 0; font-size: 24px; font-weight: 700; color: var(--color-text-primary); }
+.section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 60, "wght" 500, "SOFT" 50;
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
 
 .section-link {
   display: flex;
@@ -322,10 +343,13 @@ onMounted(loadArticles)
 
 .newsletter-title {
   margin: 0;
-  font-size: 30px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 100, "wght" 500, "SOFT" 50;
+  font-size: 38px;
+  font-weight: 500;
   color: #F0F0F8;
   text-align: center;
+  letter-spacing: -0.02em;
 }
 :root:not([data-theme='dark']) .newsletter-title { color: #111827; }
 
