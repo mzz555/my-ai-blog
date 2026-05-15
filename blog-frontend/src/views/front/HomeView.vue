@@ -4,6 +4,7 @@
     <section v-if="featured" class="hero">
       <div class="hero-inner">
         <div class="hero-left">
+          <div class="hero-kicker">— 最新一期 / {{ formatKickerDate(featured.publishedAt) }}</div>
           <div class="hero-tag-row">
             <span class="hero-badge">{{ featured.categoryName || '技术' }}</span>
             <span v-if="featured.isTop" class="hero-badge hero-badge-top">置顶</span>
@@ -126,6 +127,13 @@ async function subscribeNewsletter() {
   }
 }
 
+function formatKickerDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  return `${months[d.getMonth()]} ${d.getFullYear()}`
+}
+
 onMounted(loadArticles)
 </script>
 
@@ -184,13 +192,48 @@ onMounted(loadArticles)
 
 .hero-title {
   margin: 0;
-  font-size: 50px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 144, "wght" 400, "SOFT" 30, "WONK" 1;
+  font-size: clamp(40px, 6.5vw, 72px);
+  font-weight: 400;
+  line-height: 1.05;
   color: #F0F0F8;
-  letter-spacing: -1px;
+  letter-spacing: -0.025em;
 }
 :root:not([data-theme='dark']) .hero-title { color: #111827; }
+
+.hero-kicker {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-variation-settings: "opsz" 14, "wght" 400;
+  font-size: 14px;
+  color: var(--color-accent);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-kicker,
+.hero-tag-row,
+.hero-title,
+.hero-desc,
+.hero-meta,
+.hero-btns,
+.hero-right {
+  opacity: 0;
+  animation: hero-fade-up .8s ease forwards;
+}
+.hero-kicker  { animation-delay: 0.05s; }
+.hero-tag-row { animation-delay: 0.15s; }
+.hero-title   { animation-delay: 0.25s; }
+.hero-desc    { animation-delay: 0.40s; }
+.hero-meta    { animation-delay: 0.55s; }
+.hero-btns    { animation-delay: 0.70s; }
+.hero-right   { animation-delay: 0.30s; }
 
 .hero-desc {
   margin: 0;
