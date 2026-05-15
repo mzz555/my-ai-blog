@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS articles (
     cover_image   VARCHAR(255),
     status        VARCHAR(20)  NOT NULL DEFAULT 'DRAFT',
     view_count    INT          NOT NULL DEFAULT 0,
+    like_count    INT          NOT NULL DEFAULT 0,
     is_top        BOOLEAN      NOT NULL DEFAULT FALSE,
     allow_comment BOOLEAN      NOT NULL DEFAULT TRUE,
     author_id     BIGINT       NOT NULL,

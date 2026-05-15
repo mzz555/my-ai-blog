@@ -7,3 +7,5 @@ export const getAdminComments = (params) => request.get('/comments/admin', { par
 export const updateCommentStatus = (id, status) =>
   request.put(`/comments/${id}/status`, null, { params: { status } })
 export const deleteComment = (id) => request.delete(`/comments/${id}`)
+export const batchDeleteComments = (data) => request.post('/comments/batch-delete', data)
+export const batchUpdateCommentStatus = (data) => request.post('/comments/batch-status', data)

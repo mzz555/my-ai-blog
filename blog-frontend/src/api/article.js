@@ -12,3 +12,4 @@ export const searchArticles = (params) => request.get('/articles/search', { para
 export const likeArticle = (id) => request.post(`/articles/${id}/like`)
 export const getArticleNeighbors = (slug) => request.get(`/articles/${slug}/neighbors`)
 export const getArticleById = (id) => request.get(`/articles/admin/${id}`)
+export const batchDeleteArticles = (data) => request.post('/articles/batch-delete', data)

@@ -93,6 +93,23 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         this.removeById(id);
     }
 
+    @Override
+    @Transactional
+    public int batchDelete(java.util.List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return 0;
+        return this.baseMapper.deleteBatchIds(ids);
+    }
+
+    @Override
+    @Transactional
+    public int batchUpdateStatus(java.util.List<Long> ids, CommentStatus status) {
+        if (ids == null || ids.isEmpty()) return 0;
+        if (status != CommentStatus.APPROVED && status != CommentStatus.REJECTED) {
+            throw new IllegalArgumentException("status 只允许 APPROVED 或 REJECTED");
+        }
+        return this.baseMapper.updateStatusBatch(ids, status.name());
+    }
+
     /**
      * 批量填充评论的用户信息，避免 N+1 查询
      *

@@ -115,6 +115,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     @Transactional
+    public int batchDelete(java.util.List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return 0;
+        // 1. 先清 article_tags 关联（外键约束保护）
+        articleTagMapper.deleteByArticleIds(ids);
+        // 2. 删主表
+        return this.baseMapper.deleteBatchIds(ids);
+    }
+
+    @Override
+    @Transactional
     public void togglePublish(Long id) {
         Article article = this.getById(id);
         if (article == null) throw new NotFoundException("文章不存在");

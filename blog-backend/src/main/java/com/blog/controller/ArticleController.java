@@ -157,6 +157,17 @@ public class ArticleController {
         return Result.success();
     }
 
+    /**
+     * 批量删除文章。
+     */
+    @PostMapping("/batch-delete")
+    @PreAuthorize("hasAuthority('article:delete')")
+    public Result<java.util.Map<String, Integer>> batchDelete(
+            @Valid @RequestBody com.blog.dto.common.BatchIdsDTO dto) {
+        int deleted = articleService.batchDelete(dto.getIds());
+        return Result.success(java.util.Map.of("deleted", deleted));
+    }
+
     @GetMapping("/search")
     public Result<PageResult<ArticleListResponse>> search(
             @RequestParam String q,
